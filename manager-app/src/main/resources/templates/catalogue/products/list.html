@@ -2,16 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product list &ndash; aeresfiru</title>
+    <title>[[#{'product.page.product_list'}]] &ndash; aeresfiru</title>
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/create}">&rAarr; Create product</a>
-<h1>Product list</h1>
+<a data-th-href="@{/catalogue/products/create}" th:inline="text">&rAarr; [[#{'product.link.to_create_product'}]]</a>
+<h1>[[#{'product.page.product_list'}]]</h1>
 <table>
     <thead>
     <tr>
         <th>#</th>
-        <th>Product</th>
+        <th th:text="#{'product.name'}"></th>
     </tr>
     </thead>
     <tbody>

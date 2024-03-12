@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[${product.title}]] &ndash; aeresfiru</title>
+    <title>[[#{product.name}]] &ndash; aeresfiru</title>
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/list}">&lAarr; To the product list</a>
-<h1>Product: &laquo;[[${product.title}]]&raquo;</h1>
+<a data-th-href="@{/catalogue/products/list}">&lAarr; [[#{'product.link.to_the_product_list'}]]</a>
+<h1 th:inline="text">[[#{product.name}]]: &laquo;[[${product.title}]]&raquo;</h1>
 <ul>
-    <li><strong>ID: </strong> <span data-th-text="${product.id}"></span></li>
-    <li><strong>Title: </strong> <span data-th-text="${product.title}"></span></li>
-    <li><strong>Description: </strong> <span data-th-text="${product.details}"></span></li>
+    <li th:inline="text"><strong>[[#{'product.form.label.id'}]]: </strong> <span data-th-text="${product.id}"></span>
+    </li>
+    <li th:inline="text"><strong>[[#{'product.form.label.title'}]]: </strong> <span
+            data-th-text="${product.title}"></span></li>
+    <li th:inline="text"><strong>[[#{'product.form.label.description'}]]: </strong> <span
+            data-th-text="${product.details}"></span>
+    </li>
 </ul>
-<a data-th-href="@{/catalogue/products/{productId}/edit(productId=${product.id})}">Edit</a>
+<a data-th-href="@{/catalogue/products/{productId}/edit(productId=${product.id})}"
+   th:text="#{product.form.update.button.submit}"></a>
 <form method="post" data-th-action="@{/catalogue/products/{productId}/delete(productId=${product.id})}">
-    <button type="submit">Delete</button>
+    <button type="submit" th:text="#{'product.form.delete.button.submit'}"></button>
 </form>
 </body>
 </html>

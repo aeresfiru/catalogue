@@ -2,27 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Product</title>
+    <title th:inline="text">[[#{'product.page.create'}]]</title>
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/list}">&lAarr; To the product list</a>
-<h1>New Product</h1>
+<a data-th-href="@{/catalogue/products/list}">&lAarr; [[#{'product.link.to_the_product_list'}]]</a>
+<h1 th:text="#{'product.page.create'}"></h1>
 <div data-th-if="${errors}">
-    <h2>There were an errors:</h2>
+    <h2 th:text="#{'errors.400.title'}"></h2>
     <ul>
         <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
     </ul>
 </div>
 <form method="POST" data-th-action="@{/catalogue/products/create}">
-    <label>
-        Title:<br>
+    <label th:inline="text">
+        [[#{'product.form.label.title'}]]<br>
         <input type="text" name="title" data-th-value="${payload?.title}"/>
     </label><br>
-    <label>
-        Description:<br>
+    <label th:inline="text">
+        [[#{'product.form.label.description'}]]:<br>
         <textarea name="details" data-th-text="${payload?.details}"></textarea>
     </label><br>
-    <button type="submit">Create</button>
+    <button type="submit" th:text="#{'product.form.create.button.submit'}"></button>
 </form>
 </body>
 </html>

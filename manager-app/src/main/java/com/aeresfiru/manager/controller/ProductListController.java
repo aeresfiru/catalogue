@@ -23,8 +23,6 @@ public class ProductListController {
 
     private final ProductService productService;
 
-    private final MessageSource messageSource;
-
     @GetMapping("list")
     public String getProductsList(Model model) {
         model.addAttribute("products", this.productService.findAllProducts());
