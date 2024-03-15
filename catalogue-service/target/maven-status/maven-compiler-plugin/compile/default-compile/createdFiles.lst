@@ -1,0 +1,10 @@
+com/aeresfiru/catalogue/repository/InMemoryProductRepository.class
+com/aeresfiru/catalogue/entity/Product.class
+com/aeresfiru/catalogue/service/dto/CreateProductRequest.class
+com/aeresfiru/catalogue/service/dto/UpdateProductRequest.class
+com/aeresfiru/catalogue/controller/resource/ProductResource.class
+com/aeresfiru/catalogue/controller/ProductController.class
+com/aeresfiru/catalogue/service/ProductService.class
+com/aeresfiru/catalogue/service/DefaultProductService.class
+com/aeresfiru/catalogue/CatalogueServiceApplication.class
+com/aeresfiru/catalogue/repository/ProductRepository.class

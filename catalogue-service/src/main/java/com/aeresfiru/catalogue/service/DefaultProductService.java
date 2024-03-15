@@ -1,14 +1,13 @@
-package com.aeresfiru.manager.service;
+package com.aeresfiru.catalogue.service;
 
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.manager.repository.ProductRepository;
-import com.aeresfiru.manager.service.dto.CreateProductRequest;
-import com.aeresfiru.manager.service.dto.UpdateProductRequest;
+import com.aeresfiru.catalogue.entity.Product;
+import com.aeresfiru.catalogue.repository.ProductRepository;
+import com.aeresfiru.shared.request.CreateProductRequest;
+import com.aeresfiru.shared.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 @Service
@@ -31,23 +30,23 @@ public class DefaultProductService implements ProductService {
     @Override
     public Product findProduct(Integer productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
+                .orElseThrow(() -> new ProductNotFoundException("catalogue.errors.product.not_found"));
     }
 
     @Override
-    public void updateProduct(UpdateProductRequest request, Integer productId) {
+    public Product updateProduct(UpdateProductRequest request, Integer productId) {
         var product = this.productRepository.findById(productId)
-                .orElseThrow(NoSuchElementException::new);
-
-        this.updateProduct(product, request);
+                .orElseThrow(() -> new ProductNotFoundException("catalogue.errors.product.not_found"));
+        this.updateProductFields(product, request);
+        return product;
     }
 
     @Override
-    public void delete(Product product) {
-        this.productRepository.deleteById(product.getId());
+    public void deleteProduct(Integer productId) {
+        this.productRepository.deleteById(productId);
     }
 
-    private void updateProduct(Product product, UpdateProductRequest request) {
+    private void updateProductFields(Product product, UpdateProductRequest request) {
         if (Objects.nonNull(request.title())) {
             product.setTitle(request.title());
         }

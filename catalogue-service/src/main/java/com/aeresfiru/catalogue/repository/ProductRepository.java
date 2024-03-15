@@ -1,6 +1,6 @@
-package com.aeresfiru.manager.repository;
+package com.aeresfiru.catalogue.repository;
 
-import com.aeresfiru.manager.entity.Product;
+import com.aeresfiru.catalogue.entity.Product;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.aeresfiru.manager.entity;
+package com.aeresfiru.catalogue.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

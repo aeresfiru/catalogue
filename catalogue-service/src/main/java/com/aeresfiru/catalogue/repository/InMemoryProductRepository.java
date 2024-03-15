@@ -1,6 +1,6 @@
-package com.aeresfiru.manager.repository;
+package com.aeresfiru.catalogue.repository;
 
-import com.aeresfiru.manager.entity.Product;
+import com.aeresfiru.catalogue.entity.Product;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

@@ -1,4 +1,4 @@
-package com.aeresfiru.manager.service.dto;
+package com.aeresfiru.shared.request;
 
 import jakarta.validation.constraints.Size;
 
