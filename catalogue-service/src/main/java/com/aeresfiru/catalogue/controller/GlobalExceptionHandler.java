@@ -31,6 +31,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         problemDetail.setProperty("errors",
                 ex.getAllErrors().stream()
                         .map(ObjectError::getDefaultMessage)
+                        .map(msg -> this.getMessage(msg, request.getLocale()))
                         .toList());
         return ResponseEntity.of(problemDetail).build();
     }

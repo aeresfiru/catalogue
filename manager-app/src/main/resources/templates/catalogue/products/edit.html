@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[#{'product.page.update'}]] &laquo;[[${product.title}]]&raquo; &ndash; aeresfiru</title>
+    <title>[[#{'product.page.update'}]] &ndash; aeresfiru</title>
 </head>
 <body>
 <a data-th-href="@{/catalogue/products/{productId}(productId=${product.id})}" th:inline="text">&larr;
     [[#{'product.link.to_the_product'}]]</a>
-<h1> &laquo;[[${product.title}]]</h1>
+<h1>[[${product.title}]]</h1>
 <div data-th-if="${errors}">
     <h2 data-th-text="#{'errors.400.title'}"></h2>
     <ul>

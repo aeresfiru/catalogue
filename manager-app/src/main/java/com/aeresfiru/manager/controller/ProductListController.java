@@ -1,33 +1,24 @@
 package com.aeresfiru.manager.controller;
 
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.manager.service.ProductService;
-import com.aeresfiru.manager.service.dto.CreateProductRequest;
-import jakarta.validation.Valid;
+import com.aeresfiru.manager.client.ProductRestClient;
+import com.aeresfiru.shared.request.CreateProductRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-
-@Controller
 @RequiredArgsConstructor
-@RequestMapping("catalogue/products")
+@Controller
+@RequestMapping("/catalogue/products")
 public class ProductListController {
 
-    private final ProductService productService;
+    private final ProductRestClient productRestClient;
 
-    @GetMapping("list")
-    public String getProductsList(Model model) {
-        model.addAttribute("products", this.productService.findAllProducts());
-        return "catalogue/products/list";
-    }
+    private final MessageSource messageSource;
 
     @GetMapping("create")
     public String getNewProductPage() {
@@ -35,20 +26,25 @@ public class ProductListController {
     }
 
     @PostMapping("create")
-    public String createProduct(@Valid CreateProductRequest request, BindingResult bindingResult,
-                                Model model) {
-        if (!bindingResult.hasErrors()) {
-            Product product = this.productService.createProduct(request);
-            return "redirect:/catalogue/products/%d".formatted(product.getId());
+    public String createProduct(CreateProductRequest request, Model model) {
+        var result = this.productRestClient.createProduct(request);
+
+        if (result.isFailure()) {
+            model.addAttribute("payload", request);
+            if (result.getError().getStatus() == HttpStatus.BAD_REQUEST.value()) {
+                model.addAttribute("errors", result.getError().getProperties().get("errors"));
+            } else {
+                model.addAttribute("error", result.getError().getTitle());
+            }
+            return "catalogue/products/new_product";
         }
-        model.addAttribute("payload", request);
-        model.addAttribute("errors", getErrors(bindingResult));
-        return "catalogue/products/new_product";
+        return "redirect:/catalogue/products/%d".formatted(result.getValue().id());
     }
 
-    private static List<String> getErrors(BindingResult bindingResult) {
-        return bindingResult.getAllErrors().stream()
-                .map(ObjectError::getDefaultMessage)
-                .toList();
+    @GetMapping("/list")
+    public String getProductsList(Model model) {
+        var products = this.productRestClient.findAllProducts();
+        model.addAttribute("products", products);
+        return "catalogue/products/list";
     }
 }

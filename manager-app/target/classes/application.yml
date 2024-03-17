@@ -1,8 +1,0 @@
-server:
-  port: 8081
-spring:
-  profiles:
-    active:
-      - docker
-      - k8s
-      - other

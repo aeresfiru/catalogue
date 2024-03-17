@@ -5,6 +5,7 @@ import com.aeresfiru.catalogue.repository.ProductRepository;
 import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DefaultProductService implements ProductService {
 
     private final ProductRepository productRepository;
