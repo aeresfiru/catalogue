@@ -36,10 +36,10 @@ public class DefaultProductService implements ProductService {
     }
 
     @Override
-    public Product updateProduct(UpdateProductRequest request, Integer productId) {
+    public Product updateProductPartially(UpdateProductRequest request, Integer productId) {
         var product = this.productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("catalogue.errors.product.not_found"));
-        this.updateProductFields(product, request);
+        this.updateProductFieldsPartially(product, request);
         return product;
     }
 
@@ -48,7 +48,19 @@ public class DefaultProductService implements ProductService {
         this.productRepository.deleteById(productId);
     }
 
-    private void updateProductFields(Product product, UpdateProductRequest request) {
+    @Override
+    public Product updateProduct(UpdateProductRequest request, Integer productId) {
+        var optionalProduct = this.productRepository.findById(productId);
+        if (optionalProduct.isEmpty()) {
+            throw new ProductNotFoundException("catalogue.errors.product.not_found");
+        }
+        var product = optionalProduct.get();
+        product.setTitle(request.title());
+        product.setDetails(request.details());
+        return product;
+    }
+
+    private void updateProductFieldsPartially(Product product, UpdateProductRequest request) {
         if (Objects.nonNull(request.title())) {
             product.setTitle(request.title());
         }

@@ -23,7 +23,8 @@ public class ProductRestClientImpl implements ProductRestClient {
     private static final String baseUri = "/catalogue-api/v1/products";
 
     private static final ParameterizedTypeReference<List<Product>> PRODUCTS_TYPE_REFERENCE =
-            new ParameterizedTypeReference<>() {};
+            new ParameterizedTypeReference<>() {
+            };
 
     private final RestClient restClient;
 
@@ -59,7 +60,7 @@ public class ProductRestClientImpl implements ProductRestClient {
     @Override
     public Result<Product, ProblemDetail> updateProduct(UpdateProductRequest request, Integer productId) {
         return executeRequest(() -> this.restClient
-                .patch()
+                .put()
                 .uri(baseUri + "/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)

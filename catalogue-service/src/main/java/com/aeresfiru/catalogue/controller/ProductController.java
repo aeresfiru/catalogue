@@ -44,8 +44,15 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}")
-    public ProductResource updateProduct(@Valid @RequestBody UpdateProductRequest request,
+    public ProductResource partialUpdate(@Valid @RequestBody UpdateProductRequest request,
                                          @PathVariable("productId") Integer productId) {
+        var product = this.productService.updateProductPartially(request, productId);
+        return mapProduct(product);
+    }
+
+    @PutMapping("/{productId}")
+    public ProductResource update(@Valid @RequestBody UpdateProductRequest request,
+                                  @PathVariable("productId") Integer productId) {
         var product = this.productService.updateProduct(request, productId);
         return mapProduct(product);
     }
