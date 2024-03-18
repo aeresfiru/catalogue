@@ -1,17 +1,11 @@
 package com.aeresfiru.catalogue.repository;
 
 import com.aeresfiru.catalogue.entity.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface ProductRepository {
+public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    List<Product> findAll();
-
-    Product save(Product product);
-
-    Optional<Product> findById(Integer productId);
-
-    void deleteById(Integer id);
+    List<Product> findAllByTitleLikeIgnoreCase(String title);
 }

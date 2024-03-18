@@ -22,8 +22,8 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public List<ProductResource> findProducts() {
-        return this.productService.findAllProducts().stream()
+    public List<ProductResource> findProducts(@RequestParam(name = "filter", required = false) String filter) {
+        return this.productService.findAllProducts(filter).stream()
                 .map(ProductController::mapProduct)
                 .toList();
     }

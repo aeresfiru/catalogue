@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<Product> findAllProducts();
+    List<Product> findAllProducts(String filter);
 
     Product createProduct(CreateProductRequest request);
 

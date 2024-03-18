@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductRestClient {
 
-    List<Product> findAllProducts();
+    List<Product> findAllProducts(String filter);
 
     Result<Product, ProblemDetail> createProduct(CreateProductRequest request);
 

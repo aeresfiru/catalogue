@@ -7,6 +7,11 @@
 <body>
 <a data-th-href="@{/catalogue/products/create}" th:inline="text">&rAarr; [[#{'product.link.to_create_product'}]]</a>
 <h1>[[#{'product.page.product_list'}]]</h1>
+<form method="GET" data-th-action="@{/catalogue/products/list}">
+    <label>Filter:<input type="text" name="filter" data-th-value="${filter != null ? filter : ''}">
+        <button type="submit">Search</button>
+    </label>
+</form>
 <table>
     <thead>
     <tr>

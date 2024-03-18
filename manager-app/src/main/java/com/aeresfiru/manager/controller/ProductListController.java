@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
 @Controller
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ProductListController {
 
     private final ProductRestClient productRestClient;
-
-    private final MessageSource messageSource;
 
     @GetMapping("create")
     public String getNewProductPage() {
@@ -42,9 +41,10 @@ public class ProductListController {
     }
 
     @GetMapping("/list")
-    public String getProductsList(Model model) {
-        var products = this.productRestClient.findAllProducts();
+    public String getProductsList(Model model, @RequestParam(name = "filter", required = false) String filter) {
+        var products = this.productRestClient.findAllProducts(filter);
         model.addAttribute("products", products);
+        model.addAttribute("filter", filter);
         return "catalogue/products/list";
     }
 }
