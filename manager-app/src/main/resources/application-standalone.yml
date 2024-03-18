@@ -2,3 +2,15 @@ aeresfiru:
   services:
     catalogue:
       uri: http://localhost:8081
+      username: catalogue_user
+      password: password
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5431/manager
+    username: manager
+    password: manager
+  flyway:
+    schemas:
+      - public
+      - user_management

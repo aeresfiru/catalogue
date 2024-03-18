@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -39,7 +40,6 @@ public class ProductController {
         var productResource = mapProduct(this.productService.createProduct(request));
         var location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{productId}").buildAndExpand(productResource.id()).toUri();
-
         return ResponseEntity.created(location).body(productResource);
     }
 

@@ -83,8 +83,8 @@ public class ProductRestClientImpl implements ProductRestClient {
             T result = requestSupplier.get();
             return Result.success(result);
         } catch (HttpClientErrorException ex) {
+            log.error("Request failed: {}", ex.getMessage(), ex);
             var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
-            log.error("Request failed: {}", problemDetail);
             return Result.failure(problemDetail);
         }
     }

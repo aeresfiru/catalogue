@@ -1,4 +1,10 @@
 spring:
+  security:
+    user:
+      name: catalogue_user
+      password: '{noop}password'
+      roles:
+        - SERVICE
   datasource:
     url: jdbc:postgresql://localhost:5432/catalogue
     username: catalogue
@@ -11,7 +17,9 @@ spring:
     show-sql: true
 server:
   port: 8081
-
 logging:
   level:
     sql: info
+    org:
+      springframework:
+        security: DEBUG
