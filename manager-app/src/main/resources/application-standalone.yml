@@ -4,14 +4,6 @@ aeresfiru:
       uri: http://localhost:8081
       registration-id: keycloak
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5431/manager
-    username: manager
-    password: manager
-  flyway:
-    schemas:
-      - public
-      - user_management
   security:
     oauth2:
       client:
@@ -20,11 +12,11 @@ spring:
             issuer-uri: http://localhost:8082/realms/sc
             user-name-attribute: preferred_username
         registration:
-            keycloak:
-              client-id: manager-app
-              client-secret: dpVioAWGz7zbiDqAeYh9M8oxsKtjZTOf
-              scope:
-                - openid
-                - view_catalogue
-                - edit_catalogue
-                - microprofile-jwt
+          keycloak:
+            client-id: manager-app
+            client-secret: dpVioAWGz7zbiDqAeYh9M8oxsKtjZTOf
+            scope:
+              - openid
+              - view_catalogue
+              - edit_catalogue
+              - microprofile-jwt

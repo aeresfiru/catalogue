@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -36,11 +36,14 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResource> createProduct(@Valid @RequestBody CreateProductRequest request) {
+    public ResponseEntity<ProductResource> createProduct(@Valid @RequestBody CreateProductRequest request,
+                                                         UriComponentsBuilder uriComponentsBuilder) {
         var productResource = mapProduct(this.productService.createProduct(request));
-        var location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{productId}").buildAndExpand(productResource.id()).toUri();
-        return ResponseEntity.created(location).body(productResource);
+        return ResponseEntity
+                .created(uriComponentsBuilder
+                        .replacePath("/catalogue-api/v1/products/{productId}")
+                        .build(Map.of("productId", productResource.id())))
+                .body(productResource);
     }
 
     @PatchMapping("/{productId}")

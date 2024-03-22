@@ -3,17 +3,19 @@ package com.aeresfiru.catalogue.controller;
 import com.aeresfiru.catalogue.service.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.nio.file.AccessDeniedException;
 import java.util.Locale;
 
 @RestControllerAdvice
@@ -35,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         .map(ObjectError::getDefaultMessage)
                         .map(msg -> this.getMessage(msg, request.getLocale()))
                         .toList());
-        return ResponseEntity.of(problemDetail).build();
+        return ResponseEntity.of(problemDetail).headers(headers).build();
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
@@ -45,14 +47,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, errorMessage);
         problemDetail.setTitle(this.getMessage("catalogue.errors.404.title", locale));
         return problemDetail;
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<ProblemDetail> handleUnauthorizedException(HttpClientErrorException.Unauthorized ex) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, HttpStatus.UNAUTHORIZED.getReasonPhrase());
-        problemDetail.setDetail("Unauthorized access detected.");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetail);
     }
 
     private String getMessage(String name, Locale locale) {

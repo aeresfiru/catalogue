@@ -7,10 +7,10 @@
 <body>
 <a data-th-href="@{/catalogue/products/list}">&lAarr; [[#{'product.link.to_the_product_list'}]]</a>
 <h1 th:text="#{'product.page.create'}"></h1>
-<div data-th-if="${errors}">
-    <h2 th:text="#{'errors.400.title'}"></h2>
+<div data-th-if="${problemDetail}">
+    <h2 th:if="${problemDetail.title}" th:text="${problemDetail.title}"></h2>
     <ul>
-        <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+        <li th:each="error: ${problemDetail.properties.get('errors')}" th:text="${error}"></li>
     </ul>
 </div>
 <form method="POST" data-th-action="@{/catalogue/products/create}">

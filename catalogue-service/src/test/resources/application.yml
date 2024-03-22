@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:15.2-alpine:///sc?TC_DAEMON=true
+    username: sc
+    password: sc

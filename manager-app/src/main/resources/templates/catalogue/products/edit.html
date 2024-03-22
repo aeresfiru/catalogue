@@ -8,10 +8,10 @@
 <a data-th-href="@{/catalogue/products/{productId}(productId=${product.id})}" th:inline="text">&larr;
     [[#{'product.link.to_the_product'}]]</a>
 <h1>[[${product.title}]]</h1>
-<div data-th-if="${errors}">
+<div data-th-if="${problemDetail}">
     <h2 data-th-text="#{'errors.400.title'}"></h2>
     <ul>
-        <li data-th-each="error: ${errors}" data-th-text="${error}"></li>
+        <li data-th-each="error: ${problemDetail.properties.get('errors')}" data-th-text="${error}"></li>
     </ul>
 </div>
 <form method="post" data-th-action="@{/catalogue/products/{productId}/edit(productId=${product.id})}">

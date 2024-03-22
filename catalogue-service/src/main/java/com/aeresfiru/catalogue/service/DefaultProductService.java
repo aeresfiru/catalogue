@@ -45,8 +45,7 @@ public class DefaultProductService implements ProductService {
     @Override
     @Transactional
     public Product updateProductPartially(UpdateProductRequest request, Integer productId) {
-        var product = this.productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("catalogue.errors.product.not_found"));
+        var product = this.findProduct(productId);
         updateProductFieldsPartially(product, request);
         return product;
     }
@@ -60,7 +59,7 @@ public class DefaultProductService implements ProductService {
     @Override
     @Transactional
     public Product updateProduct(UpdateProductRequest request, Integer productId) {
-        var product = findProduct(productId);
+        var product = this.findProduct(productId);
         updateProductFields(product, request);
         return product;
     }
