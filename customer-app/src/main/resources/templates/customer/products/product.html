@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>[[${product.title}]] &ndash; aeresfiru</title>
+</head>
+<body>
+<a data-th-href="@{/customer/products/list}">Product list</a>
+<h1 data-th-text="${product.title}"></h1>
+<p data-th-text="${product.details}"></p>
+
+<form data-th-if="${!isFavourite}" method="post"
+      data-th-action="@{/customer/products/{productId}/add-to-favourites(productId=${product.id})}">
+    <button type="submit">Add to favourites</button>
+</form>
+<form data-th-if="${isFavourite}" method="post"
+      data-th-action="@{/customer/products/{productId}/remove-from-favourites(productId=${product.id})}">
+    <button type="submit">Remove from favourites</button>
+</form>
+<div data-th-if="${errors}">
+    <ul data-th-each="error : ${errors}">
+        <li><strong>[[${error}]]</strong></li>
+    </ul>
+</div>
+<form method="post" data-th-action="@{/customer/products/{productId}/create-review(productId=${product.id})}">
+    <label><input type="radio" name="rating" value="1"> 1</label>
+    <label><input type="radio" name="rating" value="2"> 2</label>
+    <label><input type="radio" name="rating" value="3"> 3</label>
+    <label><input type="radio" name="rating" value="4"> 4</label>
+    <label><input type="radio" name="rating" value="5"> 5</label>
+    <br>
+    <label>
+        Review:<br>
+        <textarea name="review" data-th-value="${payload?.review}"></textarea>
+    </label><br>
+    <button type="submit">Send review</button>
+</form>
+<div data-th-each="review : ${reviews}">
+    <h3>[[${review.rating}]]*</h3>
+    <p data-th-text="${review.review}"></p>
+</div>
+</body>
+</html>
