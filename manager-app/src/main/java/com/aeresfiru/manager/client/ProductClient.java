@@ -7,7 +7,7 @@ import org.springframework.http.ProblemDetail;
 
 import java.util.List;
 
-public interface ProductRestClient {
+public interface ProductClient {
 
     List<Product> findAllProducts(String filter);
 

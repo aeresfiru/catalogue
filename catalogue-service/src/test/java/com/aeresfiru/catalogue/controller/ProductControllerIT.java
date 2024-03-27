@@ -46,15 +46,6 @@ class ProductControllerIT {
     }
 
     @Test
-    @WithAnonymousUser
-    void findProducts_AnonymousUser_ReturnsUnauthorized() throws Exception {
-        // when
-        mockMvc.perform(get("/catalogue-api/v1/products"))
-                // then
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
     @Sql("/sql/products.sql")
     void findProductById_ProductExists_ReturnsProduct() throws Exception {
         // when
@@ -77,15 +68,15 @@ class ProductControllerIT {
                 // then
                 .andExpect(status().isNotFound());
     }
-
-    @Test
-    @WithAnonymousUser
-    void findProductById_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
-        // when
-        mockMvc.perform(get("/catalogue-api/v1/products/1"))
-                // then
-                .andExpect(status().isUnauthorized());
-    }
+//
+//    @Test
+//    @WithAnonymousUser
+//    void findProductById_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
+//        // when
+//        mockMvc.perform(get("/catalogue-api/v1/products/1"))
+//                // then
+//                .andExpect(status().isUnauthorized());
+//    }
 
     @Test
     void createProduct_RequestIsValid_ReturnsNewProduct() throws Exception {

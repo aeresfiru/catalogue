@@ -1,6 +1,6 @@
 package com.aeresfiru.manager.controller;
 
-import com.aeresfiru.manager.client.ProductRestClient;
+import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.Result;
 import com.aeresfiru.manager.entity.Product;
 import com.aeresfiru.shared.request.CreateProductRequest;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 class ProductControllerTest {
 
     @Mock
-    ProductRestClient productRestClient;
+    ProductClient productClient;
 
     @InjectMocks
     ProductController productController;
@@ -39,7 +39,7 @@ class ProductControllerTest {
         var response = new MockHttpServletResponse();
 
         doReturn(Result.success(new Product(1, "New product", "New product details")))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .createProduct(new CreateProductRequest("New product", "New product details"));
 
         // when
@@ -47,8 +47,8 @@ class ProductControllerTest {
 
         // then
         assertThat(result).isEqualTo("redirect:/catalogue/products/1");
-        verify(this.productRestClient).createProduct(request);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).createProduct(request);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -61,7 +61,7 @@ class ProductControllerTest {
         problemDetail.setProperty("errors", List.of("Title must not be blank"));
 
         doReturn(Result.failure(problemDetail))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .createProduct(new CreateProductRequest("", "New product details"));
 
         // when
@@ -70,8 +70,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("catalogue/products/new_product");
         assertThat(model.containsAttribute("problemDetail")).isTrue();
-        verify(this.productRestClient).createProduct(new CreateProductRequest("", "New product details"));
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).createProduct(new CreateProductRequest("", "New product details"));
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -83,7 +83,7 @@ class ProductControllerTest {
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2"));
 
-        doReturn(productList).when(this.productRestClient).findAllProducts(filter);
+        doReturn(productList).when(this.productClient).findAllProducts(filter);
 
         // when
         var result = this.productController.getProductsList(model, filter);
@@ -91,8 +91,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("catalogue/products/list");
         assertThat(model.containsAttribute("products")).isTrue();
-        verify(this.productRestClient).findAllProducts(filter);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findAllProducts(filter);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -102,7 +102,7 @@ class ProductControllerTest {
         var product = new Product(1, "title", "details");
         var resp = new MockHttpServletResponse();
 
-        doReturn(Result.success(product)).when(this.productRestClient).findProduct(1);
+        doReturn(Result.success(product)).when(this.productClient).findProduct(1);
 
         // when
         var result = this.productController.getProduct(1, model, resp);
@@ -110,8 +110,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("catalogue/products/product");
         assertThat(model.getAttribute("product")).isEqualTo(product);
-        verify(this.productRestClient).findProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -121,7 +121,7 @@ class ProductControllerTest {
         var problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         var resp = new MockHttpServletResponse();
 
-        doReturn(Result.failure(problemDetail)).when(this.productRestClient).findProduct(1);
+        doReturn(Result.failure(problemDetail)).when(this.productClient).findProduct(1);
 
         // when
         var result = this.productController.getProduct(1, model, resp);
@@ -129,8 +129,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("errors/404");
         assertThat(model.containsAttribute("problemDetail")).isTrue();
-        verify(this.productRestClient).findProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -140,7 +140,7 @@ class ProductControllerTest {
         var product = new Product(1, "title", "details");
         var resp = new MockHttpServletResponse();
 
-        doReturn(Result.success(product)).when(this.productRestClient).findProduct(1);
+        doReturn(Result.success(product)).when(this.productClient).findProduct(1);
 
         // when
         var result = this.productController.getProductEditPage(1, model, resp);
@@ -148,8 +148,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("catalogue/products/edit");
         assertThat(model.getAttribute("product")).isEqualTo(product);
-        verify(this.productRestClient).findProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -159,7 +159,7 @@ class ProductControllerTest {
         var problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         var resp = new MockHttpServletResponse();
 
-        doReturn(Result.failure(problemDetail)).when(this.productRestClient).findProduct(1);
+        doReturn(Result.failure(problemDetail)).when(this.productClient).findProduct(1);
 
         // when
         var result = this.productController.getProductEditPage(1, model, resp);
@@ -167,8 +167,8 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("errors/404");
         assertThat(model.containsAttribute("problemDetail")).isTrue();
-        verify(this.productRestClient).findProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -179,11 +179,11 @@ class ProductControllerTest {
         var response = new MockHttpServletResponse();
 
         doReturn(Result.success(new Product(1, "title", "details")))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .findProduct(1);
 
         doReturn(Result.success(new Product(1, "New title", "New details")))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .updateProduct(new UpdateProductRequest("New title", "New details"), 1);
 
         // when
@@ -191,9 +191,9 @@ class ProductControllerTest {
 
         // then
         assertThat(result).isEqualTo("redirect:/catalogue/products/1");
-        verify(this.productRestClient).findProduct(1);
-        verify(this.productRestClient).updateProduct(request, 1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verify(this.productClient).updateProduct(request, 1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -204,11 +204,11 @@ class ProductControllerTest {
         var response = new MockHttpServletResponse();
 
         doReturn(Result.success(new Product(1, "title", "details")))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .findProduct(1);
 
         doReturn(Result.failure(ProblemDetail.forStatus(HttpStatus.BAD_REQUEST)))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .updateProduct(new UpdateProductRequest("", null), 1);
 
         // when
@@ -217,9 +217,9 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("catalogue/products/edit");
         assertThat(model.containsAttribute("problemDetail")).isTrue();
-        verify(this.productRestClient).findProduct(1);
-        verify(this.productRestClient).updateProduct(request, 1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verify(this.productClient).updateProduct(request, 1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
@@ -230,7 +230,7 @@ class ProductControllerTest {
         var response = new MockHttpServletResponse();
 
         doReturn(Result.failure(ProblemDetail.forStatus(HttpStatus.NOT_FOUND)))
-                .when(this.productRestClient)
+                .when(this.productClient)
                 .findProduct(1);
 
         // when
@@ -239,21 +239,21 @@ class ProductControllerTest {
         // then
         assertThat(result).isEqualTo("errors/404");
         assertThat(model.containsAttribute("problemDetail")).isTrue();
-        verify(this.productRestClient).findProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).findProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 
     @Test
     void deleteProduct_RequestIsValid_ReturnsProductListPage() {
         // given
         var model = new ConcurrentModel();
-        doReturn(mock(Result.class)).when(this.productRestClient).deleteProduct(1);
+        doReturn(mock(Result.class)).when(this.productClient).deleteProduct(1);
 
         // when
         var result = this.productController.deleteProduct(1, model);
 
         assertThat(result).isEqualTo("redirect:/catalogue/products/list");
-        verify(this.productRestClient).deleteProduct(1);
-        verifyNoMoreInteractions(this.productRestClient);
+        verify(this.productClient).deleteProduct(1);
+        verifyNoMoreInteractions(this.productClient);
     }
 }

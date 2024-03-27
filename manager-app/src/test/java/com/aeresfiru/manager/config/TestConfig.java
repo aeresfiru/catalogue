@@ -1,6 +1,6 @@
 package com.aeresfiru.manager.config;
 
-import com.aeresfiru.manager.client.ProductRestClientImpl;
+import com.aeresfiru.manager.client.RestClientProductClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,7 @@ public class TestConfig {
 
     @Bean
     @Primary
-    public ProductRestClientImpl testProductRestClient(
+    public RestClientProductClient testProductRestClient(
             @Value("${aeresfiru.services.catalogue.uri:http://localhost:54321}") String catalogueBaseUri
     ) {
         var client = (HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build());
@@ -37,6 +37,6 @@ public class TestConfig {
                 .requestFactory(new JdkClientHttpRequestFactory(client))
                 .baseUrl(catalogueBaseUri)
                 .build();
-        return new ProductRestClientImpl(restClient);
+        return new RestClientProductClient(restClient);
     }
 }

@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 @RequiredArgsConstructor
 @Slf4j
-public class ProductRestClientImpl implements ProductRestClient {
+public class RestClientProductClient implements ProductClient {
 
     private static final String baseUri = "/catalogue-api/v1/products";
 

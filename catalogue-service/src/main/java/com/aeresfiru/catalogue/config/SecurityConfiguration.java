@@ -19,7 +19,7 @@ public class SecurityConfiguration {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/catalogue-api/v1/products/**")
-                        .hasAuthority("SCOPE_view_catalogue")
+                        .permitAll()
                         .requestMatchers(HttpMethod.POST, "/catalogue-api/v1/products")
                         .hasAuthority("SCOPE_edit_catalogue")
                         .requestMatchers(HttpMethod.PUT, "/catalogue-api/v1/products/{productId}")

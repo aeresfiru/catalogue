@@ -1,6 +1,6 @@
 package com.aeresfiru.manager.config;
 
-import com.aeresfiru.manager.client.ProductRestClientImpl;
+import com.aeresfiru.manager.client.RestClientProductClient;
 import com.aeresfiru.manager.security.OauthClientHttpRequestInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,12 +16,12 @@ import org.springframework.web.client.RestClient;
 public class ClientConfig {
 
     @Bean
-    public ProductRestClientImpl productsRestClient(
+    public RestClientProductClient productsRestClient(
             @Value("${aeresfiru.services.catalogue.uri:http://localhost:8081}") String catalogueBaseUri,
             ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientRepository authorizedClientRepository,
             @Value("${aeresfiru.services.catalogue.registration-id:keycloak}") String registrationId) {
-        return new ProductRestClientImpl(RestClient.builder()
+        return new RestClientProductClient(RestClient.builder()
                 .baseUrl(catalogueBaseUri)
                 .requestInterceptor(
                         new OauthClientHttpRequestInterceptor(

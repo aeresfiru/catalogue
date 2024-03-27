@@ -1,7 +1,7 @@
 package com.aeresfiru.manager.controller;
 
 
-import com.aeresfiru.manager.client.ProductRestClient;
+import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/catalogue/products")
 public class ProductController {
 
-    private final ProductRestClient productRestClient;
+    private final ProductClient productClient;
 
     @GetMapping("/create")
     public String getNewProductPage() {
@@ -29,7 +29,7 @@ public class ProductController {
 
     @PostMapping("/create")
     public String createProduct(CreateProductRequest request, Model model, HttpServletResponse resp) {
-        var result = this.productRestClient.createProduct(request);
+        var result = this.productClient.createProduct(request);
         if (result.isFailure()) {
             model.addAttribute("payload", request);
             model.addAttribute("problemDetail", result.getError());
@@ -41,7 +41,7 @@ public class ProductController {
 
     @GetMapping("/list")
     public String getProductsList(Model model, @RequestParam(name = "filter", required = false) String filter) {
-        var products = this.productRestClient.findAllProducts(filter);
+        var products = this.productClient.findAllProducts(filter);
         model.addAttribute("products", products);
         model.addAttribute("filter", filter);
         return "catalogue/products/list";
@@ -49,7 +49,7 @@ public class ProductController {
 
     @GetMapping("/{productId:\\d+}")
     public String getProduct(@PathVariable int productId, Model model, HttpServletResponse resp) {
-        var result = this.productRestClient.findProduct(productId);
+        var result = this.productClient.findProduct(productId);
         if (result.isFailure()) {
             return handleProductNotFound(model, resp, result.getError());
         }
@@ -59,7 +59,7 @@ public class ProductController {
 
     @GetMapping("/{productId:\\d+}/edit")
     public String getProductEditPage(@PathVariable int productId, Model model, HttpServletResponse resp) {
-        var result = this.productRestClient.findProduct(productId);
+        var result = this.productClient.findProduct(productId);
         if (result.isFailure()) {
             return handleProductNotFound(model, resp, result.getError());
         }
@@ -70,11 +70,11 @@ public class ProductController {
     @PostMapping("/{productId:\\d+}/edit")
     public String updateProduct(@PathVariable int productId, UpdateProductRequest request,
                                 Model model, HttpServletResponse resp) {
-        var product = this.productRestClient.findProduct(productId);
+        var product = this.productClient.findProduct(productId);
         if (product.isFailure()) {
             return handleProductNotFound(model, resp, product.getError());
         }
-        var result = this.productRestClient.updateProduct(request, productId);
+        var result = this.productClient.updateProduct(request, productId);
         if (result.isFailure()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("product", product.getValue());
@@ -88,7 +88,7 @@ public class ProductController {
 
     @PostMapping("/{productId:\\d+}/delete")
     public String deleteProduct(@PathVariable int productId, Model model) {
-        var result = this.productRestClient.deleteProduct(productId);
+        var result = this.productClient.deleteProduct(productId);
         if (result.isFailure()) {
             model.addAttribute("problemDetail", result.getError());
         }
