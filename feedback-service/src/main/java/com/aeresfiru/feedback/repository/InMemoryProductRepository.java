@@ -1,6 +1,6 @@
-package com.aeresfiru.customer.repository;
+package com.aeresfiru.feedback.repository;
 
-import com.aeresfiru.customer.entity.FavouriteProduct;
+import com.aeresfiru.feedback.entity.FavouriteProduct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -16,9 +16,8 @@ public class InMemoryProductRepository implements FavouriteProductRepository {
     private final List<FavouriteProduct> favouriteProducts = new CopyOnWriteArrayList<>();
 
     @Override
-    public Mono<FavouriteProduct> save(FavouriteProduct favouriteProduct) {
-        return Mono.fromRunnable(() -> favouriteProducts.add(favouriteProduct))
-                .thenReturn(favouriteProduct);
+    public Mono<FavouriteProduct> save(Mono<FavouriteProduct> favouriteProduct) {
+        return favouriteProduct.doOnNext(this.favouriteProducts::add);
     }
 
     @Override

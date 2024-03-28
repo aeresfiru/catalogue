@@ -1,21 +1,6 @@
 package com.aeresfiru.customer.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
-import java.util.UUID;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ProductReview {
-
-    private UUID id;
-
-    private int productId;
-
-    private int rating;
-
-    private String review;
+public record ProductReview(String id, int productId, int rating, String review) implements Serializable {
 }

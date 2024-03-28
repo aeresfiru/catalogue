@@ -1,17 +1,19 @@
 package com.aeresfiru.customer.controller;
 
+import com.aeresfiru.customer.client.FavouriteProductClient;
 import com.aeresfiru.customer.client.ProductClient;
+import com.aeresfiru.customer.client.ProductReviewClient;
+import com.aeresfiru.customer.client.exception.BadRequestClientException;
+import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
+import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
 import com.aeresfiru.customer.entity.Product;
 import com.aeresfiru.customer.entity.ProductReview;
-import com.aeresfiru.customer.service.FavouriteProductService;
-import com.aeresfiru.customer.service.ProductReviewService;
-import com.aeresfiru.customer.service.dto.ProductReviewRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,11 +28,12 @@ import java.util.NoSuchElementException;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/customer/products/{productId:\\d+}")
+@Slf4j
 public class ProductController {
 
     private final ProductClient productClient;
-    private final FavouriteProductService favouriteService;
-    private final ProductReviewService reviewService;
+    private final FavouriteProductClient favouriteProductClient;
+    private final ProductReviewClient productReviewClient;
 
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> product(@PathVariable(name = "productId") Integer productId) {
@@ -40,12 +43,12 @@ public class ProductController {
 
     @ModelAttribute(name = "isFavourite", binding = false)
     public Mono<Boolean> isFavourite(@PathVariable(name = "productId") Integer productId) {
-        return this.favouriteService.isFavouriteProduct(productId);
+        return this.favouriteProductClient.findFavouriteProductByProductId(productId).hasElement();
     }
 
     @ModelAttribute(name = "reviews", binding = false)
     public Flux<ProductReview> productReviews(@PathVariable(name = "productId") Integer productId) {
-        return this.reviewService.findAllProductReviews(productId);
+        return this.productReviewClient.findProductReviewsByProductId(productId);
     }
 
     @GetMapping
@@ -55,29 +58,33 @@ public class ProductController {
 
     @PostMapping("/add-to-favourites")
     public Mono<String> addProductToFavourites(@PathVariable Integer productId) {
-        return this.favouriteService.addProductToFavourites(productId)
-                .thenReturn("redirect:/customer/products/%d".formatted(productId));
+        return this.favouriteProductClient.addProductToFavourites(new CreateFavouriteProductRequest(productId))
+                .thenReturn("redirect:/customer/products/%d".formatted(productId))
+                .doOnError(ex -> log.error(ex.getMessage(), ex))
+                .onErrorResume(BadRequestClientException.class,
+                        ex -> Mono.just("/customer/products/product"));
     }
 
     @PostMapping("/remove-from-favourites")
     public Mono<String> removeProductFromFavourites(@PathVariable Integer productId) {
-        return this.favouriteService.removeProductFromFavourites(productId)
+        return this.favouriteProductClient.removeProductFromFavourites(productId)
                 .thenReturn("redirect:/customer/products/%d".formatted(productId));
     }
 
     @PostMapping("/create-review")
-    public Mono<String> createReview(@PathVariable Integer productId,
-                                     @Validated ProductReviewRequest request,
-                                     BindingResult errors,
-                                     Model model) {
-        if (errors.hasErrors()) {
-            model.addAttribute("payload", request);
-            model.addAttribute("errors", errors.getAllErrors().stream()
-                    .map(ObjectError::getDefaultMessage).toList());
-            return Mono.just("customer/products/product");
-        }
-        return this.reviewService.createProductReview(productId, request.rating(), request.review())
-                .thenReturn("redirect:/customer/products/" + productId);
+    public Mono<String> createReview(@ModelAttribute("product") Mono<Product> productMono,
+                                     CreateProductReviewRequest request,
+                                     Model model,
+                                     ServerHttpResponse response) {
+        return productMono.flatMap(product ->
+                this.productReviewClient.createProductReview(request)
+                        .thenReturn("redirect:/customer/products/%d".formatted(product.id()))
+                        .onErrorResume(BadRequestClientException.class, exception -> {
+                            model.addAttribute("payload", request);
+                            model.addAttribute("errors", exception.getErrors());
+                            response.setStatusCode(HttpStatus.BAD_REQUEST);
+                            return Mono.just("customer/products/product");
+                        }));
     }
 
     @ExceptionHandler(NoSuchElementException.class)

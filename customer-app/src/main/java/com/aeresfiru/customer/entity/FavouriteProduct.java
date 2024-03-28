@@ -1,17 +1,6 @@
 package com.aeresfiru.customer.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.io.Serializable;
 
-import java.util.UUID;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public final class FavouriteProduct {
-
-    private UUID id;
-
-    private int productId;
+public record FavouriteProduct(String id, int productId) implements Serializable {
 }

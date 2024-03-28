@@ -17,4 +17,13 @@ public class ClientConfig {
                 .baseUrl(baseUrl)
                 .build();
     }
+
+    @Bean
+    @Qualifier("feedbackWebClient")
+    public WebClient feedbackWebClient(
+            @Value("${aeresfiru.services.feedback.url:http://localhost:8085}") String baseUrl) {
+        return WebClient.builder()
+                .baseUrl(baseUrl)
+                .build();
+    }
 }

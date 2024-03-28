@@ -2,5 +2,7 @@ aeresfiru:
   services:
     catalogue:
       url: http://localhost:8081
+    feedback:
+      url: http://localhost:8085
 server:
   port: 8083

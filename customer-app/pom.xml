@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.aeresfiru</groupId>
         <artifactId>sc</artifactId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.7-SNAPSHOT</version>
     </parent>
 
     <artifactId>customer-app</artifactId>
@@ -21,15 +21,11 @@
         <dependency>
             <groupId>com.aeresfiru</groupId>
             <artifactId>shared</artifactId>
-            <version>1.6-SNAPSHOT</version>
+            <version>1.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>

@@ -1,6 +1,6 @@
-package com.aeresfiru.customer.repository;
+package com.aeresfiru.feedback.repository;
 
-import com.aeresfiru.customer.entity.ProductReview;
+import com.aeresfiru.feedback.entity.ProductReview;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
