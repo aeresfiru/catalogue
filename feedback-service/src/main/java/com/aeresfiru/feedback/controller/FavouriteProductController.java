@@ -45,7 +45,7 @@ public class FavouriteProductController {
     public Mono<ResponseEntity<FavouriteProductResource>> addProductToFavourites(
             @Valid @RequestBody Mono<CreateFavouriteProductRequest> request,
             UriComponentsBuilder builder) {
-        return this.favouriteProductService.addProductToFavourites(request)
+        return request.flatMap(this.favouriteProductService::addProductToFavourites)
                 .flatMap(this::mapToFavouriteProductResource)
                 .map(product -> ResponseEntity
                         .created(builder

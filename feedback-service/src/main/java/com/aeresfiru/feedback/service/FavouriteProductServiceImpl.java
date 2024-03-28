@@ -17,8 +17,8 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
     private final FavouriteProductRepository repository;
 
     @Override
-    public Mono<FavouriteProduct> addProductToFavourites(Mono<CreateFavouriteProductRequest> request) {
-        return this.repository.save(mapToFavouriteProduct(request));
+    public Mono<FavouriteProduct> addProductToFavourites(CreateFavouriteProductRequest request) {
+        return this.mapToFavouriteProduct(request).flatMap(this.repository::save);
     }
 
     @Override
@@ -36,7 +36,7 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
         return this.repository.findByProductId(productId);
     }
 
-    private static Mono<FavouriteProduct> mapToFavouriteProduct(Mono<CreateFavouriteProductRequest> request) {
-        return request.map(req -> new FavouriteProduct(UUID.randomUUID(), req.productId()));
+    private Mono<FavouriteProduct> mapToFavouriteProduct(CreateFavouriteProductRequest req) {
+        return Mono.just(new FavouriteProduct(UUID.randomUUID(), req.productId()));
     }
 }
