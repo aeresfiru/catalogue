@@ -4,6 +4,7 @@ import com.aeresfiru.customer.client.FavouriteProductClient;
 import com.aeresfiru.customer.client.ProductClient;
 import com.aeresfiru.customer.entity.FavouriteProduct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/customer/products")
+@Slf4j
 public class ProductListController {
 
     private final ProductClient productClient;
@@ -24,9 +26,13 @@ public class ProductListController {
                                              Model model) {
         return this.productClient.findAllProducts(filter)
                 .collectList()
-                .doOnNext(products -> model.addAttribute("products", products)
-                        .addAttribute("filter", filter))
-                .thenReturn("customer/products/list");
+                .doOnNext(products -> {
+                    model.addAttribute("products", products);
+                    model.addAttribute("filter", filter);
+                    log.info("Retrieved product list with filter: {}", filter);
+                })
+                .thenReturn("customer/products/list")
+                .doOnError(error -> log.error("Error retrieving product list", error));
     }
 
     @GetMapping("favourites")
@@ -38,8 +44,12 @@ public class ProductListController {
                 .flatMap(favouriteProducts -> this.productClient.findAllProducts(filter)
                         .filter(product -> favouriteProducts.contains(product.id()))
                         .collectList()
-                        .doOnNext(products -> model.addAttribute("products", products)
-                                .addAttribute("filter", filter)))
-                .thenReturn("customer/products/favourites");
+                        .doOnNext(products -> {
+                            model.addAttribute("products", products);
+                            model.addAttribute("filter", filter);
+                            log.info("Retrieved favourite products with filter: {}", filter);
+                        }))
+                .thenReturn("customer/products/favourites")
+                .doOnError(error -> log.error("Error retrieving favourite products", error));
     }
 }
