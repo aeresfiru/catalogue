@@ -1,6 +1,7 @@
 package com.aeresfiru.catalogue.controller;
 
 import com.aeresfiru.catalogue.controller.resource.ProductResource;
+import com.aeresfiru.catalogue.controller.resource.ProductResourceAssembler;
 import com.aeresfiru.catalogue.entity.Product;
 import com.aeresfiru.catalogue.service.ProductNotFoundException;
 import com.aeresfiru.catalogue.service.ProductService;
@@ -11,6 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -22,10 +29,14 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@ComponentScan("com.aeresfiru.catalogue.controller")
 class ProductControllerTest {
 
     @Mock
     ProductService productService;
+
+    @Mock
+    ProductResourceAssembler productResourceAssembler;
 
     @InjectMocks
     ProductController productController;
@@ -33,17 +44,24 @@ class ProductControllerTest {
     @Test
     void findProducts_requestIsValid_ReturnsProductList() {
         // given
-        var productList = List.of(
+        Page<Product> productPage = new PageImpl<>(List.of(
                 new Product(1, "title #1", "details #1"),
-                new Product(2, "title #2", "details #2"));
-        var filter = "title";
-        doReturn(productList).when(this.productService).findAllProducts(filter);
+                new Product(2, "title #2", "details #2")));
+        Pageable pageable = PageRequest.of(0, 2);
+        String filter = "title";
+
+        doReturn(new ProductResource(1, "title #1", "details #1"))
+                .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 1));
+        doReturn(new ProductResource(2, "title #2", "details #2"))
+                .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 2));
+
+        doReturn(productPage).when(this.productService).findAllProducts(filter, pageable);
 
         // when
-        var result = this.productController.findProducts(filter);
+        var result = this.productController.findProducts(filter, pageable);
 
         // then
-        assertThat(result).isEqualTo(List.of(
+        assertThat(result.getContent()).isEqualTo(List.of(
                 new ProductResource(1, "title #1", "details #1"),
                 new ProductResource(2, "title #2", "details #2")
         ));
@@ -53,7 +71,9 @@ class ProductControllerTest {
     void findProductById_ProductExists_ReturnsProductResource() {
         // given
         var product = new Product(1, "Product title", "Product description");
+        var resource = new ProductResource(1, "Product title", "Product description");
         doReturn(product).when(this.productService).findProduct(1);
+        doReturn(resource).when(this.productResourceAssembler).toResource(product);
 
         // when
         var result = this.productController.findProductById(1);
@@ -78,7 +98,9 @@ class ProductControllerTest {
         var product = new Product(1, "title", "details");
         var request = new CreateProductRequest("title", "details");
         var uriComponentsBuilder = UriComponentsBuilder.fromUri(URI.create("/catalogue-api/v1/products"));
+        var resource = new ProductResource(1, "title", "details");
         doReturn(product).when(this.productService).createProduct(request);
+        doReturn(resource).when(this.productResourceAssembler).toResource(product);
 
         // when
         var result = this.productController.createProduct(request, uriComponentsBuilder);
@@ -93,19 +115,21 @@ class ProductControllerTest {
     }
 
     @Test
-    void partialUpdate_requestIsValid_ReturnsProduct() {
+    void update_requestIsValid_ReturnsProduct() {
         // given
         var request = new UpdateProductRequest("Updated title", null);
-        doReturn(new Product(1, "Updated title", "details"))
-                .when(this.productService).updateProductPartially(request, 1);
+        var resource = new ProductResource(1, "Updated title", "details");
+        var product = new Product(1, "Updated title", "details");
+        doReturn(product).when(this.productService).updateProduct(request, 1);
+        doReturn(resource).when(this.productResourceAssembler).toResource(product);
 
         // when
-        var result = this.productController.partialUpdate(request, 1);
+        var result = this.productController.update(request, 1);
 
         // then
         assertThat(result).isEqualTo(new ProductResource(1, "Updated title", "details"));
 
-        verify(this.productService).updateProductPartially(request, 1);
+        verify(this.productService).updateProduct(request, 1);
         verifyNoMoreInteractions(this.productService);
     }
 

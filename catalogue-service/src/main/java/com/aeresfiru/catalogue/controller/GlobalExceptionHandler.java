@@ -11,12 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -25,28 +26,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private final MessageSource messageSource;
 
     @Override
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
                                                                   HttpHeaders headers,
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
         String errorMessage = this.getMessage("catalogue.errors.400.title", request.getLocale());
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errorMessage);
-        problemDetail.setProperty("errors",
-                ex.getAllErrors().stream()
-                        .map(ObjectError::getDefaultMessage)
-                        .map(msg -> this.getMessage(msg, request.getLocale()))
-                        .toList());
-        return ResponseEntity.of(problemDetail).headers(headers).build();
+        List<String> errors = this.getErrors(ex, request);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorMessage);
+        problemDetail.setStatus(status.value());
+        problemDetail.setProperty("errors", errors);
+        return ResponseEntity.status(status).headers(headers).body(problemDetail);
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail handleCustomException(ProductNotFoundException ex, Locale locale) {
-        String errorMessage = this.getMessage(this.getMessage(ex.getMessage(), locale), locale);
+    public ProblemDetail handleProductNotFoundException(ProductNotFoundException ex, Locale locale) {
+        String errorMessage = this.getMessage(ex.getMessage(), locale);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, errorMessage);
-        problemDetail.setTitle(this.getMessage("catalogue.errors.404.title", locale));
+        problemDetail.setTitle(getMessage("catalogue.errors.404.title", locale));
         return problemDetail;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleException(Exception ex, Locale locale) {
+        String errorMessage = this.getMessage("catalogue.errors.500.detail", locale);
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+        problemDetail.setTitle(getMessage("catalogue.errors.500.title", locale));
+        return problemDetail;
+    }
+
+    private List<String> getErrors(MethodArgumentNotValidException ex, WebRequest request) {
+        return ex.getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .map(msg -> getMessage(msg, request.getLocale()))
+                .collect(Collectors.toList());
     }
 
     private String getMessage(String name, Locale locale) {

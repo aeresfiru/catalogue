@@ -2,16 +2,16 @@ package com.aeresfiru.catalogue.service;
 
 import com.aeresfiru.catalogue.entity.Product;
 import com.aeresfiru.catalogue.repository.ProductRepository;
+import com.aeresfiru.catalogue.service.mapper.ProductMapper;
 import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,64 +21,46 @@ public class DefaultProductService implements ProductService {
 
     private final ProductRepository productRepository;
 
+    private final ProductMapper mapper;
+
     @Override
-    public List<Product> findAllProducts(String filter) {
+    public Page<Product> findAllProducts(String filter, Pageable pageable) {
         if (StringUtils.hasText(filter)) {
-            return this.productRepository.findAllByTitleLikeIgnoreCase("%" + filter + "%");
+            log.info("Retrieved filter parameter: {}, fetching all by filter", filter);
+            return this.productRepository.findAllByTitleLikeIgnoreCase("%" + filter + "%", pageable);
         }
-        return this.productRepository.findAll();
+        log.info("No filter parameter provided, fetching all products");
+        return this.productRepository.findAll(pageable);
     }
 
     @Override
     @Transactional
     public Product createProduct(CreateProductRequest request) {
-        var product = mapToProduct(request);
+        log.info("Creating product from request: {}", request);
+        var product = this.mapper.mapToProduct(request);
         return productRepository.save(product);
     }
 
     @Override
     public Product findProduct(Integer productId) {
+        log.info("Fetching product by id: {}", productId);
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("catalogue.errors.product.not_found"));
     }
 
     @Override
     @Transactional
-    public Product updateProductPartially(UpdateProductRequest request, Integer productId) {
+    public Product updateProduct(UpdateProductRequest request, Integer productId) {
+        log.info("Updating product ID: {}, request: {}", productId, request);
         var product = this.findProduct(productId);
-        updateProductFieldsPartially(product, request);
+        this.mapper.updateProduct(product, request);
         return product;
     }
 
     @Override
     @Transactional
     public void deleteProduct(Integer productId) {
+        log.warn("Delete product by ID: {}", productId);
         this.productRepository.deleteById(productId);
-    }
-
-    @Override
-    @Transactional
-    public Product updateProduct(UpdateProductRequest request, Integer productId) {
-        var product = this.findProduct(productId);
-        updateProductFields(product, request);
-        return product;
-    }
-
-    private static void updateProductFields(Product product, UpdateProductRequest request) {
-        product.setTitle(request.title());
-        product.setDetails(request.details());
-    }
-
-    private static void updateProductFieldsPartially(Product product, UpdateProductRequest request) {
-        if (Objects.nonNull(request.title())) {
-            product.setTitle(request.title());
-        }
-        if (Objects.nonNull(request.details())) {
-            product.setDetails(request.details());
-        }
-    }
-
-    private static Product mapToProduct(CreateProductRequest request) {
-        return new Product(null, request.title(), request.details());
     }
 }

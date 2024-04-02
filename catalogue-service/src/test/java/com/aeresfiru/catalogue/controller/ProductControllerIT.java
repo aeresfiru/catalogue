@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,11 +36,13 @@ class ProductControllerIT {
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json("""
-                                [
-                                    {"id":  1, "title":  "Product #1 filter", "details":  "Product #1 details"},
-                                    {"id":  3, "title":  "Product #3 filter", "details":  "Product #3 details"}
-                                ]
-                                """, true)
+                                {
+                                    "content": [
+                                        {"id":  1, "title":  "Product #1 filter", "details":  "Product #1 details"},
+                                        {"id":  3, "title":  "Product #3 filter", "details":  "Product #3 details"}
+                                    ]
+                                }
+                                """)
                 );
     }
 
@@ -55,8 +56,11 @@ class ProductControllerIT {
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json("""
-                                {"id": 1, "title": "Product #1 filter", "details": "Product #1 details"}
-                                """, true)
+                                {
+                                    "id": 1,
+                                    "title": "Product #1 filter",
+                                    "details": "Product #1 details"
+                                }""")
                 );
     }
 
@@ -68,15 +72,6 @@ class ProductControllerIT {
                 // then
                 .andExpect(status().isNotFound());
     }
-//
-//    @Test
-//    @WithAnonymousUser
-//    void findProductById_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
-//        // when
-//        mockMvc.perform(get("/catalogue-api/v1/products/1"))
-//                // then
-//                .andExpect(status().isUnauthorized());
-//    }
 
     @Test
     void createProduct_RequestIsValid_ReturnsNewProduct() throws Exception {
@@ -84,7 +79,10 @@ class ProductControllerIT {
         mockMvc.perform(post("/catalogue-api/v1/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"title":  "Product title", "details":  "Product details"}
+                                {
+                                    "title": "Product title",
+                                    "details": "Product details"
+                                }
                                 """))
                 // then
                 .andExpectAll(
@@ -93,9 +91,11 @@ class ProductControllerIT {
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json("""
                                 {
-                                    "id" : 1, "title": "Product title", "details": "Product details"
+                                    "id" : 1,
+                                    "title": "Product title",
+                                    "details": "Product details"
                                 }
-                                """, true)
+                                """)
                 );
     }
 
@@ -139,26 +139,30 @@ class ProductControllerIT {
 
     @Test
     @Sql("/sql/products.sql")
-    void partialUpdate_RequestIsValid_ReturnsProduct() throws Exception {
+    void update_RequestIsValid_ReturnsProduct() throws Exception {
         // when
         mockMvc.perform(patch("/catalogue-api/v1/products/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                        {"title": "Updated title"}
-                                """))
+                                {
+                                    "title": "Updated title"
+                                }"""))
                 // then
                 .andExpectAll(
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json("""
-                                    {"id": 1, "title":  "Updated title", "details": "Product #1 details"}
-                                """, true)
+                                {
+                                    "id": 1,
+                                    "title": "Updated title",
+                                    "details": "Product #1 details"
+                                }""")
                 );
     }
 
     @Test
     @Sql("/sql/products.sql")
-    void partialUpdate_RequestIsInvalid_ReturnsProblemDetail() throws Exception {
+    void update_RequestIsInvalid_ReturnsProblemDetail() throws Exception {
         // when
         mockMvc.perform(patch("/catalogue-api/v1/products/1")
                         .locale(Locale.US)
@@ -181,69 +185,11 @@ class ProductControllerIT {
     }
 
     @Test
-    void partialUpdate_ProductDoesNotExists_ReturnsProblemDetail() throws Exception {
+    void update_ProductDoesNotExists_ReturnsProblemDetail() throws Exception {
         mockMvc.perform(patch("/catalogue-api/v1/products/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                     {"title": "Updated title"}
-                                """))
-                // then
-                .andExpectAll(
-                        status().isNotFound(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON)
-                );
-    }
-
-    @Test
-    @Sql("/sql/products.sql")
-    void update_RequestIsValid_ReturnsProduct() throws Exception {
-        // when
-        mockMvc.perform(put("/catalogue-api/v1/products/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                    {"title": "Updated title", "details":  "Product #1 details"}
-                                """))
-                // then
-                .andExpectAll(
-                        status().isOk(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        content().json("""
-                                    {"id": 1, "title": "Updated title", "details": "Product #1 details"}
-                                """)
-                );
-    }
-
-    @Test
-    @Sql("/sql/products.sql")
-    void update_RequestIsInvalid_ReturnsProblemDetail() throws Exception {
-        // when
-        mockMvc.perform(put("/catalogue-api/v1/products/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                    {"title": "_"}
-                                """)
-                        .locale(Locale.US))
-                // then
-                .andExpectAll(
-                        status().isBadRequest(),
-                        content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON),
-                        content().json("""
-                                    {
-                                        "errors": [
-                                            "Title size must be between 3 and 50 symbols"
-                                        ]
-                                    }
-                                """)
-                );
-    }
-
-    @Test
-    void update_ProductDoesNotExist_ReturnsProblemDetail() throws Exception {
-        // when
-        mockMvc.perform(put("/catalogue-api/v1/products/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                   {"title": "Updated title"}
                                 """))
                 // then
                 .andExpectAll(

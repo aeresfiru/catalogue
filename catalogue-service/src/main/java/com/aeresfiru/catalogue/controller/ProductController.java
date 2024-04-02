@@ -1,18 +1,29 @@
 package com.aeresfiru.catalogue.controller;
 
 import com.aeresfiru.catalogue.controller.resource.ProductResource;
-import com.aeresfiru.catalogue.entity.Product;
+import com.aeresfiru.catalogue.controller.resource.ProductResourceAssembler;
 import com.aeresfiru.catalogue.service.ProductService;
 import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -21,52 +32,43 @@ import java.util.Map;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductResourceAssembler resourceAssembler;
 
     @GetMapping
-    public List<ProductResource> findProducts(@RequestParam(name = "filter", required = false) String filter) {
-        return this.productService.findAllProducts(filter).stream()
-                .map(ProductController::mapProduct)
-                .toList();
+    public Page<ProductResource> findProducts(@RequestParam(name = "filter", required = false) String filter,
+                                              @PageableDefault Pageable pageable) {
+        return this.productService.findAllProducts(filter, pageable)
+                .map(this.resourceAssembler::toResource);
     }
 
     @GetMapping("/{productId}")
     public ProductResource findProductById(@PathVariable Integer productId) {
         var product = this.productService.findProduct(productId);
-        return mapProduct(product);
+        return this.resourceAssembler.toResource(product);
     }
 
     @PostMapping
     public ResponseEntity<ProductResource> createProduct(@Valid @RequestBody CreateProductRequest request,
                                                          UriComponentsBuilder uriComponentsBuilder) {
-        var productResource = mapProduct(this.productService.createProduct(request));
+        var product = this.productService.createProduct(request);
+        var model = resourceAssembler.toResource(product);
         return ResponseEntity
                 .created(uriComponentsBuilder
                         .replacePath("/catalogue-api/v1/products/{productId}")
-                        .build(Map.of("productId", productResource.id())))
-                .body(productResource);
+                        .build(Map.of("productId", product.getId())))
+                .body(model);
     }
 
     @PatchMapping("/{productId}")
-    public ProductResource partialUpdate(@Valid @RequestBody UpdateProductRequest request,
-                                         @PathVariable("productId") Integer productId) {
-        var product = this.productService.updateProductPartially(request, productId);
-        return mapProduct(product);
-    }
-
-    @PutMapping("/{productId}")
     public ProductResource update(@Valid @RequestBody UpdateProductRequest request,
                                   @PathVariable("productId") Integer productId) {
         var product = this.productService.updateProduct(request, productId);
-        return mapProduct(product);
+        return this.resourceAssembler.toResource(product);
     }
 
     @DeleteMapping("/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable Integer productId) {
         this.productService.deleteProduct(productId);
-    }
-
-    private static ProductResource mapProduct(Product product) {
-        return new ProductResource(product.getId(), product.getTitle(), product.getDetails());
     }
 }

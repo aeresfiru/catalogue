@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,9 +23,10 @@ class ProductRepositoryIT {
     void findAllByTitleLikeIgnoreCase_ReturnsProductList() {
         // given
         String filter = "%filter%";
+        Pageable pageable = PageRequest.of(0, 5);
 
         // when
-        var products = this.productRepository.findAllByTitleLikeIgnoreCase(filter);
+        var products = this.productRepository.findAllByTitleLikeIgnoreCase(filter, pageable);
 
         // then
         assertThat(products).containsExactly(
