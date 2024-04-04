@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -35,10 +36,10 @@ public class ProductController {
     private final ProductResourceAssembler resourceAssembler;
 
     @GetMapping
-    public Page<ProductResource> findProducts(@RequestParam(name = "filter", required = false) String filter,
-                                              @PageableDefault Pageable pageable) {
-        return this.productService.findAllProducts(filter, pageable)
-                .map(this.resourceAssembler::toResource);
+    public List<ProductResource> findProducts(@RequestParam(name = "filter", required = false) String filter) {
+        return this.productService.findAllProducts(filter).stream()
+                .map(this.resourceAssembler::toResource)
+                .toList();
     }
 
     @GetMapping("/{productId}")

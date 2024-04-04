@@ -6,7 +6,7 @@ import reactor.core.publisher.Mono;
 
 public interface ProductClient {
 
-    Flux<Product> findAllProducts(String filter);
+    Flux<Product> findAllProducts(String filter, Integer page, Integer size);
 
     Mono<Product> findProduct(Integer productId);
 }

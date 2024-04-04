@@ -17,8 +17,8 @@ public class ProductReviewServiceImpl implements ProductReviewService {
     private final ProductReviewRepository productReviewRepository;
 
     @Override
-    public Mono<ProductReview> createProductReview(CreateProductReviewRequest request) {
-        return this.mapToReview(request).flatMap(this.productReviewRepository::save);
+    public Mono<ProductReview> createProductReview(CreateProductReviewRequest request, String userId) {
+        return this.mapToReview(request, userId).flatMap(this.productReviewRepository::save);
     }
 
     @Override
@@ -26,7 +26,8 @@ public class ProductReviewServiceImpl implements ProductReviewService {
         return this.productReviewRepository.findAllByProductId(productId);
     }
 
-    private Mono<ProductReview> mapToReview(CreateProductReviewRequest request) {
-        return Mono.just(new ProductReview(UUID.randomUUID(), request.productId(), request.rating(), request.review()));
+    private Mono<ProductReview> mapToReview(CreateProductReviewRequest req, String userId) {
+        return Mono.just(
+                new ProductReview(UUID.randomUUID(), req.productId(), req.rating(), req.review(), userId));
     }
 }

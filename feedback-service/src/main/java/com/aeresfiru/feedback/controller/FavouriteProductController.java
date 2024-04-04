@@ -6,7 +6,9 @@ import com.aeresfiru.feedback.service.FavouriteProductService;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,44 +25,59 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/feedback-api/v1/favourite-products")
 @RequiredArgsConstructor
+@Slf4j
 public class FavouriteProductController {
 
     private final FavouriteProductService favouriteProductService;
 
     @GetMapping
-    public Flux<FavouriteProductResource> findFavouriteProducts() {
-        return this.favouriteProductService.getFavouriteProducts()
-                .flatMap(this::mapToFavouriteProductResource);
+    public Flux<FavouriteProductResource> findFavouriteProducts(Mono<JwtAuthenticationToken> principalMono) {
+        return principalMono.flatMapMany(principal -> {
+            return favouriteProductService.getFavouriteProducts(getUserId(principal))
+                    .flatMap(this::mapToFavouriteProductResource);
+        });
     }
 
     @GetMapping("/by-product/{productId}")
     public Mono<FavouriteProductResource> findFavouriteProductByProductId(
+            Mono<JwtAuthenticationToken> principalMono,
             @PathVariable("productId") int productId) {
-        return this.favouriteProductService.findFavouriteProductByProduct(productId)
-                .flatMap(this::mapToFavouriteProductResource)
-                .switchIfEmpty(Mono.error(new NoSuchElementException("feedback.products.errors.not_found")));
+        return principalMono.flatMap(principal -> {
+            return this.favouriteProductService.findFavouriteProductByProduct(productId, getUserId(principal))
+                    .flatMap(this::mapToFavouriteProductResource)
+                    .switchIfEmpty(Mono.error(new NoSuchElementException("feedback.products.errors.not_found")));
+        });
     }
 
     @PostMapping
     public Mono<ResponseEntity<FavouriteProductResource>> addProductToFavourites(
+            Mono<JwtAuthenticationToken> principalMono,
             @Valid @RequestBody Mono<CreateFavouriteProductRequest> request,
             UriComponentsBuilder builder) {
-        return request.flatMap(this.favouriteProductService::addProductToFavourites)
-                .flatMap(this::mapToFavouriteProductResource)
-                .map(product -> ResponseEntity
-                        .created(builder
-                                .replacePath("/feedback-api/v1/favourite-products/{id}")
-                                .build(product.getId()))
-                        .body(product));
+        return principalMono.flatMap(principal ->
+                request.flatMap(req -> this.favouriteProductService.addProductToFavourites(req, getUserId(principal)))
+                        .flatMap(this::mapToFavouriteProductResource)
+                        .map(product -> ResponseEntity
+                                .created(builder
+                                        .replacePath("/feedback-api/v1/favourite-products/{id}")
+                                        .build(product.getId()))
+                                .body(product)));
     }
 
     @DeleteMapping("/by-product/{productId}")
-    public Mono<ResponseEntity<Void>> removeProductFromFavourites(@PathVariable("productId") int productId) {
-        return this.favouriteProductService.removeProductFromFavourites(productId)
-                .thenReturn(ResponseEntity.noContent().build());
+    public Mono<ResponseEntity<Void>> removeProductFromFavourites(
+            Mono<JwtAuthenticationToken> principalMono,
+            @PathVariable("productId") int productId) {
+        return principalMono.flatMap(principal ->
+                this.favouriteProductService.removeProductFromFavourites(productId, getUserId(principal))
+                        .thenReturn(ResponseEntity.noContent().build()));
     }
 
     private Mono<FavouriteProductResource> mapToFavouriteProductResource(FavouriteProduct product) {
         return Mono.just(new FavouriteProductResource(product.getId().toString(), product.getProductId()));
+    }
+
+    private static String getUserId(JwtAuthenticationToken principal) {
+        return principal.getToken().getSubject();
     }
 }

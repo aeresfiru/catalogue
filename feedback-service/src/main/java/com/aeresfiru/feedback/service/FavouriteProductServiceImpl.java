@@ -17,26 +17,26 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
     private final FavouriteProductRepository repository;
 
     @Override
-    public Mono<FavouriteProduct> addProductToFavourites(CreateFavouriteProductRequest request) {
-        return this.mapToFavouriteProduct(request).flatMap(this.repository::save);
+    public Mono<FavouriteProduct> addProductToFavourites(CreateFavouriteProductRequest request, String userId) {
+        return this.mapToFavouriteProduct(request, userId).flatMap(this.repository::save);
     }
 
     @Override
-    public Mono<Void> removeProductFromFavourites(int productId) {
-        return this.repository.removeByProductId(productId);
+    public Mono<Void> removeProductFromFavourites(int productId, String userId) {
+        return this.repository.removeByProductIdAndUserId(productId, userId);
     }
 
     @Override
-    public Flux<FavouriteProduct> getFavouriteProducts() {
-        return this.repository.findAll();
+    public Flux<FavouriteProduct> getFavouriteProducts(String userId) {
+        return this.repository.findAllByUserId(userId);
     }
 
     @Override
-    public Mono<FavouriteProduct> findFavouriteProductByProduct(Integer productId) {
-        return this.repository.findByProductId(productId);
+    public Mono<FavouriteProduct> findFavouriteProductByProduct(Integer productId, String userId) {
+        return this.repository.findByProductIdAndUserId(productId, userId);
     }
 
-    private Mono<FavouriteProduct> mapToFavouriteProduct(CreateFavouriteProductRequest req) {
-        return Mono.just(new FavouriteProduct(UUID.randomUUID(), req.productId()));
+    private Mono<FavouriteProduct> mapToFavouriteProduct(CreateFavouriteProductRequest req, String userId) {
+        return Mono.just(new FavouriteProduct(UUID.randomUUID(), req.productId(), userId));
     }
 }

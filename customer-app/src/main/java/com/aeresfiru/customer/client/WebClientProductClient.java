@@ -3,6 +3,7 @@ package com.aeresfiru.customer.client;
 import com.aeresfiru.customer.entity.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class WebClientProductClient implements ProductClient {
     private final ErrorHandler errorHandler;
 
     @Override
-    public Flux<Product> findAllProducts(String filter) {
+    public Flux<Product> findAllProducts(String filter, Integer page, Integer size) {
         return this.productWebClient.get()
                 .uri(baseUri + "?filter={filter}", filter)
                 .retrieve()

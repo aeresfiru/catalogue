@@ -6,3 +6,19 @@ aeresfiru:
       url: http://localhost:8085
 server:
   port: 8083
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: customer-app
+            client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - view_catalogue

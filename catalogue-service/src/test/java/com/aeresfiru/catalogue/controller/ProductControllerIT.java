@@ -36,14 +36,10 @@ class ProductControllerIT {
                         status().isOk(),
                         content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
                         content().json("""
-                                {
-                                    "content": [
-                                        {"id":  1, "title":  "Product #1 filter", "details":  "Product #1 details"},
-                                        {"id":  3, "title":  "Product #3 filter", "details":  "Product #3 details"}
-                                    ]
-                                }
-                                """)
-                );
+                                [
+                                    {"id":  1, "title":  "Product #1 filter", "details":  "Product #1 details"},
+                                    {"id":  3, "title":  "Product #3 filter", "details":  "Product #3 details"}
+                                ]"""));
     }
 
     @Test

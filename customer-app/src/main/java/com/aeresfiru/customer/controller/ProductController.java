@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
+import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,6 +37,13 @@ public class ProductController {
     private final FavouriteProductClient favouriteProductClient;
 
     private final ProductReviewClient productReviewClient;
+
+    @ModelAttribute
+    public Mono<CsrfToken> csrfTokenMono(ServerWebExchange exchange) {
+        return exchange.<Mono<CsrfToken>>getAttribute(CsrfToken.class.getName())
+                .doOnSuccess(csrfToken -> exchange.getAttributes()
+                        .put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, csrfToken));
+    }
 
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> product(@PathVariable(name = "productId") Integer productId) {

@@ -26,7 +26,7 @@ class ProductRepositoryIT {
         Pageable pageable = PageRequest.of(0, 5);
 
         // when
-        var products = this.productRepository.findAllByTitleLikeIgnoreCase(filter, pageable);
+        var products = this.productRepository.findAllByTitleLikeIgnoreCase(filter);
 
         // then
         assertThat(products).containsExactly(

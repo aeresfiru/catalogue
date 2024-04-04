@@ -10,9 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,40 +58,38 @@ class DefaultProductServiceTest {
     @Test
     void findAllProducts_WithFilter_ReturnsFilteredProducts() {
         // given
-        var productPage = new PageImpl<>(List.of(new Product(1, "filtered", "details")));
-        var pageable = PageRequest.of(0, 2);
-        doReturn(productPage).when(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%", pageable);
+        var products = List.of(new Product(1, "filtered", "details"));
+        doReturn(products).when(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%");
 
         // when
-        var result = this.productService.findAllProducts("filter", pageable);
+        var result = this.productService.findAllProducts("filter");
 
         // then
-        assertThat(result).isNotEmpty();
-        assertThat(result.getContent()).containsExactly(new Product(1, "filtered", "details"));
+        assertThat(result).isNotEmpty()
+                .containsExactly(new Product(1, "filtered", "details"));
 
-        verify(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%", pageable);
+        verify(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%");
         verifyNoMoreInteractions(this.productRepository);
     }
 
     @Test
     void findAllProducts_WithoutFilter_ReturnsAllProducts() {
         // given
-        var productPage = new PageImpl<>(List.of(
-                new Product(1, "title#1", "details#1"),
-                new Product(2, "title#2", "details#2")));
-        var pageable = PageRequest.of(0, 2);
-        doReturn(productPage).when(this.productRepository).findAll(pageable);
-
-        // when
-        var result = this.productService.findAllProducts(null, pageable);
-
-        // then
-        assertThat(result).isNotEmpty();
-        assertThat(result.getContent()).containsExactlyInAnyOrder(
+        var products = List.of(
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2"));
+        doReturn(products).when(this.productRepository).findAll();
 
-        verify(this.productRepository).findAll(pageable);
+        // when
+        var result = this.productService.findAllProducts(null);
+
+        // then
+        assertThat(result).isNotEmpty().containsExactlyInAnyOrder(
+                new Product(1, "title#1", "details#1"),
+                new Product(2, "title#2", "details#2")
+        );
+
+        verify(this.productRepository).findAll();
         verifyNoMoreInteractions(this.productRepository);
     }
 

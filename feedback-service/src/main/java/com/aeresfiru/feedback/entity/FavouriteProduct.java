@@ -16,4 +16,6 @@ public final class FavouriteProduct {
     private UUID id;
 
     private int productId;
+
+    private String userId;
 }

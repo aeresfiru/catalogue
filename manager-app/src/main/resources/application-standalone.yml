@@ -1,3 +1,5 @@
+server:
+  port: 8084
 aeresfiru:
   services:
     catalogue:
@@ -20,5 +22,3 @@ spring:
               - view_catalogue
               - edit_catalogue
               - microprofile-jwt
-server:
-  port: 8084

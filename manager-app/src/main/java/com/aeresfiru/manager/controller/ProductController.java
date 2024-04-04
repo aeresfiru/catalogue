@@ -2,6 +2,9 @@ package com.aeresfiru.manager.controller;
 
 
 import com.aeresfiru.manager.client.ProductClient;
+import com.aeresfiru.manager.client.exception.ClientBadRequestException;
+import com.aeresfiru.manager.client.exception.ClientEntityNotFoundException;
+import com.aeresfiru.manager.entity.Product;
 import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -9,95 +12,50 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.BindException;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/catalogue/products")
+@RequestMapping("/catalogue/products/{productId:\\d+}")
 public class ProductController {
 
     private final ProductClient productClient;
 
-    @GetMapping("/create")
-    public String getNewProductPage() {
-        return "catalogue/products/new_product";
+    @ModelAttribute("product")
+    public Product product(@PathVariable("productId") int productId) {
+        return this.productClient.findProduct(productId);
     }
 
-    @PostMapping("/create")
-    public String createProduct(CreateProductRequest request, Model model, HttpServletResponse resp) {
-        var result = this.productClient.createProduct(request);
-        if (result.isFailure()) {
-            model.addAttribute("payload", request);
-            model.addAttribute("problemDetail", result.getError());
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return "catalogue/products/new_product";
-        }
-        return "redirect:/catalogue/products/" + result.getValue().id();
-    }
-
-    @GetMapping("/list")
-    public String getProductsList(Model model, @RequestParam(name = "filter", required = false) String filter) {
-        var products = this.productClient.findAllProducts(filter);
-        model.addAttribute("products", products);
-        model.addAttribute("filter", filter);
-        return "catalogue/products/list";
-    }
-
-    @GetMapping("/{productId:\\d+}")
-    public String getProduct(@PathVariable int productId, Model model, HttpServletResponse resp) {
-        var result = this.productClient.findProduct(productId);
-        if (result.isFailure()) {
-            return handleProductNotFound(model, resp, result.getError());
-        }
-        model.addAttribute("product", result.getValue());
+    @GetMapping
+    public String getProduct() {
         return "catalogue/products/product";
     }
 
-    @GetMapping("/{productId:\\d+}/edit")
-    public String getProductEditPage(@PathVariable int productId, Model model, HttpServletResponse resp) {
-        var result = this.productClient.findProduct(productId);
-        if (result.isFailure()) {
-            return handleProductNotFound(model, resp, result.getError());
-        }
-        model.addAttribute("product", result.getValue());
+    @GetMapping("/edit")
+    public String getProductEditPage() {
         return "catalogue/products/edit";
     }
 
-    @PostMapping("/{productId:\\d+}/edit")
-    public String updateProduct(@PathVariable int productId, UpdateProductRequest request,
+    @PostMapping("/edit")
+    public String updateProduct(@PathVariable("productId") int productId, UpdateProductRequest request,
                                 Model model, HttpServletResponse resp) {
-        var product = this.productClient.findProduct(productId);
-        if (product.isFailure()) {
-            return handleProductNotFound(model, resp, product.getError());
-        }
-        var result = this.productClient.updateProduct(request, productId);
-        if (result.isFailure()) {
+        try {
+            var product = this.productClient.updateProduct(request, productId);
+            model.addAttribute("product", product);
+            return "redirect:/catalogue/products/%d".formatted(productId);
+        } catch (ClientBadRequestException ex) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            model.addAttribute("product", product.getValue());
             model.addAttribute("payload", request);
-            model.addAttribute("problemDetail", result.getError());
+            model.addAttribute("problemDetail", ex.getProblemDetail());
             return "catalogue/products/edit";
         }
-        model.addAttribute("product", result.getValue());
-        return "redirect:/catalogue/products/%d".formatted(productId);
     }
 
-    @PostMapping("/{productId:\\d+}/delete")
-    public String deleteProduct(@PathVariable int productId, Model model) {
-        var result = this.productClient.deleteProduct(productId);
-        if (result.isFailure()) {
-            model.addAttribute("problemDetail", result.getError());
-        }
+    @PostMapping("/delete")
+    public String deleteProduct(@PathVariable("productId") int productId) {
+        this.productClient.deleteProduct(productId);
         return "redirect:/catalogue/products/list";
-    }
-
-    private static String handleProductNotFound(Model model, HttpServletResponse resp, ProblemDetail problemDetail) {
-        resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        model.addAttribute("problemDetail", problemDetail);
-        return "errors/404";
     }
 }
