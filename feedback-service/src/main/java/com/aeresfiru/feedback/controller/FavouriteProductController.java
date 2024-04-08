@@ -32,21 +32,19 @@ public class FavouriteProductController {
 
     @GetMapping
     public Flux<FavouriteProductResource> findFavouriteProducts(Mono<JwtAuthenticationToken> principalMono) {
-        return principalMono.flatMapMany(principal -> {
-            return favouriteProductService.getFavouriteProducts(getUserId(principal))
-                    .flatMap(this::mapToFavouriteProductResource);
-        });
+        return principalMono.flatMapMany(principal ->
+                favouriteProductService.findFavouriteProducts(getUserId(principal))
+                        .flatMap(this::mapToFavouriteProductResource));
     }
 
     @GetMapping("/by-product/{productId}")
     public Mono<FavouriteProductResource> findFavouriteProductByProductId(
             Mono<JwtAuthenticationToken> principalMono,
             @PathVariable("productId") int productId) {
-        return principalMono.flatMap(principal -> {
-            return this.favouriteProductService.findFavouriteProductByProduct(productId, getUserId(principal))
-                    .flatMap(this::mapToFavouriteProductResource)
-                    .switchIfEmpty(Mono.error(new NoSuchElementException("feedback.products.errors.not_found")));
-        });
+        return principalMono.flatMap(principal ->
+                this.favouriteProductService.findFavouriteProductByProduct(productId, getUserId(principal))
+                        .flatMap(this::mapToFavouriteProductResource)
+                        .switchIfEmpty(Mono.error(new NoSuchElementException("feedback.products.errors.not_found"))));
     }
 
     @PostMapping
@@ -74,7 +72,7 @@ public class FavouriteProductController {
     }
 
     private Mono<FavouriteProductResource> mapToFavouriteProductResource(FavouriteProduct product) {
-        return Mono.just(new FavouriteProductResource(product.getId().toString(), product.getProductId()));
+        return Mono.just(new FavouriteProductResource(product.getId().toString(), product.getProductId(), product.getUserId()));
     }
 
     private static String getUserId(JwtAuthenticationToken principal) {

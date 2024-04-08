@@ -13,4 +13,5 @@ public class ProductReviewResource implements Serializable {
     private int productId;
     private int rating;
     private String review;
+    private String userId;
 }

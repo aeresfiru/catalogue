@@ -23,11 +23,11 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
 
     @Override
     public Mono<Void> removeProductFromFavourites(int productId, String userId) {
-        return this.repository.removeByProductIdAndUserId(productId, userId);
+        return this.repository.deleteByProductIdAndUserId(productId, userId);
     }
 
     @Override
-    public Flux<FavouriteProduct> getFavouriteProducts(String userId) {
+    public Flux<FavouriteProduct> findFavouriteProducts(String userId) {
         return this.repository.findAllByUserId(userId);
     }
 

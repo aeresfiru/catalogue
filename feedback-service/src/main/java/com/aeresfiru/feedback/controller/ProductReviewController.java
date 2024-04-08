@@ -53,6 +53,6 @@ public class ProductReviewController {
 
     private Mono<ProductReviewResource> mapToProductReviewResource(ProductReview review) {
         return Mono.just(new ProductReviewResource(review.getId().toString(), review.getProductId(),
-                review.getRating(), review.getReview()));
+                review.getRating(), review.getReview() ,review.getUserId()));
     }
 }

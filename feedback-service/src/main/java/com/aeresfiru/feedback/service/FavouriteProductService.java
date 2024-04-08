@@ -11,7 +11,7 @@ public interface FavouriteProductService {
 
     Mono<Void> removeProductFromFavourites(int productId, String userId);
 
-    Flux<FavouriteProduct> getFavouriteProducts(String userId);
+    Flux<FavouriteProduct> findFavouriteProducts(String userId);
 
     Mono<FavouriteProduct> findFavouriteProductByProduct(Integer productId, String userId);
 }

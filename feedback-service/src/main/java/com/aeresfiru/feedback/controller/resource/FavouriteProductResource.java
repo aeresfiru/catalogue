@@ -11,4 +11,5 @@ public class FavouriteProductResource implements Serializable {
 
     private String id;
     private int productId;
+    private String userId;
 }
