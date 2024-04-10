@@ -1,14 +1,15 @@
-package com.aeresfiru.customer.client;
+package com.aeresfiru.customer.controller;
 
 import com.aeresfiru.customer.client.exception.ClientEntityNotFoundException;
 import com.aeresfiru.customer.client.exception.ClientServerErrorException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
@@ -20,25 +21,26 @@ public class GlobalExceptionHandler {
     private final MessageSource messageSource;
 
     @ExceptionHandler(ClientServerErrorException.class)
-    public Mono<String> handleServerErrorException(ClientServerErrorException ex, Model model) {
+    public String handleClientServerErrorException(ClientServerErrorException ex, Model model) {
         log.error("Client server exception: {}", ex.getMessage(), ex);
-        model.addAttribute("error", ex.getMessage());
-        return Mono.just("errors/500");
+        model.addAttribute("problemDetail", ex.getProblemDetail());
+        return "errors/500";
     }
 
     @ExceptionHandler(ClientEntityNotFoundException.class)
-    public Mono<String> handleEntityNotFoundException(ClientEntityNotFoundException ex, Model model) {
+    public String handleClientEntityNotFoundException(ClientEntityNotFoundException ex, Model model) {
         log.error("Resource not found: {}", ex.getMessage(), ex);
-        model.addAttribute("error", ex.getMessage());
-        return Mono.just("errors/404");
+        model.addAttribute("problemDetail", ex.getProblemDetail());
+        return "errors/404";
     }
 
     @ExceptionHandler(Exception.class)
-    public Mono<String> handleException(Exception ex, Model model, Locale locale) {
+    public String handleException(Exception ex, Model model, Locale locale) {
         log.error("Unknown exception occurred: {}", ex.getMessage(), ex);
         var error = this.getMessage("customer.errors.500.title", locale);
-        model.addAttribute("error", error);
-        return Mono.just("errors/500");
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, error);
+        model.addAttribute("problemDetail", problemDetail);
+        return "errors/500";
     }
 
     private String getMessage(String code, Locale locale) {

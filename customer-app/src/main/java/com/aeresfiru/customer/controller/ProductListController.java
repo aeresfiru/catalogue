@@ -24,6 +24,7 @@ public class ProductListController {
 
     private final ProductClient productClient;
     private final FavouriteProductClient favouriteProductClient;
+
     @GetMapping("list")
     public Mono<String> showProductsListPage(@RequestParam(name = "filter", required = false) String filter,
                                              @RequestParam(name = "page", defaultValue = "0") Integer page,

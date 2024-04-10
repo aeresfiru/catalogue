@@ -4,7 +4,6 @@ import com.aeresfiru.customer.client.FavouriteProductClient;
 import com.aeresfiru.customer.client.ProductClient;
 import com.aeresfiru.customer.client.ProductReviewClient;
 import com.aeresfiru.customer.client.exception.ClientBadRequestException;
-import com.aeresfiru.customer.client.exception.ClientEntityNotFoundException;
 import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
 import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
 import com.aeresfiru.customer.entity.Product;
@@ -17,11 +16,7 @@ import org.springframework.security.web.reactive.result.view.CsrfRequestDataValu
 import org.springframework.security.web.server.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -39,17 +34,16 @@ public class ProductController {
     private final ProductReviewClient productReviewClient;
 
     @ModelAttribute
-    public Mono<CsrfToken> csrfTokenMono(ServerWebExchange exchange) {
+    public Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
         return exchange.<Mono<CsrfToken>>getAttribute(CsrfToken.class.getName())
-                .doOnSuccess(csrfToken -> exchange.getAttributes()
-                        .put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, csrfToken));
+                .doOnNext(csrfToken -> exchange.getAttributes()
+                        .put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, csrfToken))
+                .doOnError(ex -> log.error("Csrf token not found", ex));
     }
 
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> product(@PathVariable(name = "productId") Integer productId) {
-        return this.productClient.findProduct(productId)
-                .switchIfEmpty(Mono.error(new ClientEntityNotFoundException("catalogue.errors.404.title")))
-                .doOnError(ex -> log.error("Error retrieving product with ID: {}", productId, ex));
+        return this.productClient.findProduct(productId);
     }
 
     @ModelAttribute(name = "isFavourite", binding = false)

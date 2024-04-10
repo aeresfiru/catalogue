@@ -44,7 +44,6 @@ public class WebClientProductClient implements ProductClient {
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response -> errorHandler.handleServerError(response.bodyToMono(ProblemDetail.class)))
                 .bodyToMono(Product.class)
-                .doOnError(ex -> log.error("Error retrieving product by ID {}", productId, ex))
-                .onErrorComplete(WebClientResponseException.NotFound.class);
+                .doOnError(ex -> log.error("Error retrieving product by ID {}", productId, ex));
     }
 }

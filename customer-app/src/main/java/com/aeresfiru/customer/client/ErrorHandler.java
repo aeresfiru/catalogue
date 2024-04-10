@@ -17,25 +17,26 @@ import java.util.List;
 public class ErrorHandler {
 
     public Mono<? extends Throwable> handleClientError(Mono<ProblemDetail> errorResponse) {
-        return errorResponse.flatMap(error -> {
-            int status = error.getStatus();
+        return errorResponse.flatMap(problemDetail -> {
+            int status = problemDetail.getStatus();
             if (status == HttpStatus.NOT_FOUND.value()) {
-                return Mono.error(new ClientEntityNotFoundException(error.getDetail()));
+                log.error("Req");
+                return Mono.error(new ClientEntityNotFoundException(problemDetail));
             } else if (status == HttpStatus.BAD_REQUEST.value()) {
-                return extractErrors(error)
+                return extractErrors(problemDetail)
                         .collectList()
                         .flatMap(errors -> Mono.error(new ClientBadRequestException(errors)));
             } else {
                 log.error("Unexpected client error status: {}", status);
-                return Mono.error(new ClientServerErrorException(error.getDetail()));
+                return Mono.error(new ClientServerErrorException(problemDetail));
             }
         });
     }
 
     public Mono<? extends Throwable> handleServerError(Mono<ProblemDetail> errorResponse) {
-        return errorResponse.flatMap(error -> {
-            log.error("Server error occurred: {}", error);
-            return Mono.error(new ClientServerErrorException(error.getDetail()));
+        return errorResponse.flatMap(problemDetail -> {
+            log.error("Server error occurred: {}", problemDetail);
+            return Mono.error(new ClientServerErrorException(problemDetail));
         });
     }
 
