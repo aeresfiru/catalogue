@@ -1,6 +1,7 @@
 package com.aeresfiru.feedback.controller;
 
 import com.aeresfiru.feedback.entity.FavouriteProduct;
+import com.aeresfiru.shared.client.PageApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -58,11 +60,7 @@ class FavouriteProductControllerIT {
                 .expectAll(
                         spec -> spec.expectStatus().isOk(),
                         spec -> spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        spec -> spec.expectBodyList(FavouriteProduct.class).hasSize(2).contains(
-                                new FavouriteProduct(UUID.fromString("7c2f09af-9678-4744-91fa-77f2386361fd"), 1,
-                                        "fe5b0b92-6212-4356-9a52-5f438e747b2a"),
-                                new FavouriteProduct(UUID.fromString("697de5c3-2675-4fd9-a295-34ff2c82675c"), 3,
-                                        "fe5b0b92-6212-4356-9a52-5f438e747b2a"))
+                        spec -> spec.expectBodyList(new ParameterizedTypeReference<PageApiResponse<FavouriteProduct>>() {})
                 );
     }
 

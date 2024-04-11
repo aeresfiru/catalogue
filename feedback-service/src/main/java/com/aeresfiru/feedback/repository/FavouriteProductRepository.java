@@ -1,6 +1,7 @@
 package com.aeresfiru.feedback.repository;
 
 import com.aeresfiru.feedback.entity.FavouriteProduct;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,5 +14,7 @@ public interface FavouriteProductRepository extends ReactiveCrudRepository<Favou
 
     Mono<FavouriteProduct> findByProductIdAndUserId(int productId, String userId);
 
-    Flux<FavouriteProduct> findAllByUserId(String userId);
+    Flux<FavouriteProduct> findAllByUserId(String userId, Pageable pageable);
+
+    Mono<Long> countAllByUserId(String userId);
 }

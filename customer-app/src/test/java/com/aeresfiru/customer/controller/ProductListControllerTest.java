@@ -1,9 +1,9 @@
 package com.aeresfiru.customer.controller;
 
-import com.aeresfiru.customer.client.FavouriteProductClient;
-import com.aeresfiru.customer.client.ProductClient;
-import com.aeresfiru.customer.entity.FavouriteProduct;
 import com.aeresfiru.customer.entity.Product;
+import com.aeresfiru.customer.service.FavouriteProductService;
+import com.aeresfiru.customer.service.ProductService;
+import com.aeresfiru.shared.client.PageApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,16 +18,15 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProductListControllerTest {
 
     @Mock
-    ProductClient productClient;
+    ProductService productService;
 
     @Mock
-    FavouriteProductClient favouriteProductClient;
+    FavouriteProductService favouriteProductService;
 
     @InjectMocks
     ProductListController controller;
@@ -36,10 +35,10 @@ class ProductListControllerTest {
     void showProductsListPage_RequestIsValid_ReturnsProductListPage() {
         // given
         var model = new ConcurrentModel();
-        doReturn(Flux.fromIterable(List.of(
+        doReturn(Mono.just(new PageApiResponse<>(List.of(
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2")
-        ))).when(this.productClient).findAllProducts("filter", 0, 10);
+        ), 10, 0, 2, 1))).when(this.productService).findAllProducts("filter", 0, 10);
 
         // when
         StepVerifier.create(this.controller.showProductsListPage("filter", 0, 10, model))
@@ -57,18 +56,13 @@ class ProductListControllerTest {
     void showFavouriteProductsPage_RequestIsValid_ReturnsFavouriteProductsPage() {
         // given
         var model = new ConcurrentModel();
-        doReturn(Flux.fromIterable(List.of(
-                new FavouriteProduct("a72b9e97-00ff-4702-900c-4ce83986b659", 1),
-                new FavouriteProduct("0bba92f1-a5c3-4319-9d73-4ab431255276", 2)
-        ))).when(this.favouriteProductClient).findAllFavouriteProducts();
-        doReturn(Flux.fromIterable(List.of(
+        doReturn(Flux.just(
                 new Product(1, "title#1", "details#1"),
-                new Product(2, "title#1", "details#1"),
-                new Product(3, "title#1", "details#1")
-        ))).when(this.productClient).findAllProducts("filter", null, null);
+                new Product(2, "title#1", "details#1"))
+        ).when(this.favouriteProductService).findAllFavouriteProducts("filter", 0, 10);
 
         // when
-        StepVerifier.create(this.controller.showFavouriteProductsPage("filter", model))
+        StepVerifier.create(this.controller.showFavouriteProductsPage("filter", 0, 10, model))
                 // then
                 .expectNext("customer/products/favourites")
                 .verifyComplete();

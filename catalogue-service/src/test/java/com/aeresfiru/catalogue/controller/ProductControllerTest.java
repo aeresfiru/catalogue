@@ -13,6 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -43,19 +46,20 @@ class ProductControllerTest {
                 new Product(1, "title #1", "details #1"),
                 new Product(2, "title #2", "details #2"));
         String filter = "title";
+        Pageable pageable = PageRequest.of(0, 10);
 
         doReturn(new ProductResource(1, "title #1", "details #1"))
                 .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 1));
         doReturn(new ProductResource(2, "title #2", "details #2"))
                 .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 2));
 
-        doReturn(products).when(this.productService).findAllProducts(filter);
+        doReturn(new PageImpl<>(products)).when(this.productService).findAllProducts(filter, pageable);
 
         // when
-        var result = this.productController.findProducts(filter);
+        var result = this.productController.findProducts(filter, pageable);
 
         // then
-        assertThat(result).isEqualTo(List.of(
+        assertThat(result.getContent()).isEqualTo(List.of(
                 new ProductResource(1, "title #1", "details #1"),
                 new ProductResource(2, "title #2", "details #2")
         ));

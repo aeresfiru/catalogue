@@ -1,19 +1,14 @@
 package com.aeresfiru.customer.controller;
 
-import com.aeresfiru.customer.client.FavouriteProductClient;
-import com.aeresfiru.customer.client.ProductClient;
-import com.aeresfiru.customer.entity.FavouriteProduct;
+import com.aeresfiru.customer.service.FavouriteProductService;
+import com.aeresfiru.customer.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.web.server.csrf.CsrfToken;
-import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -22,40 +17,31 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ProductListController {
 
-    private final ProductClient productClient;
-    private final FavouriteProductClient favouriteProductClient;
+    private final ProductService productService;
+    private final FavouriteProductService favouriteProductService;
 
     @GetMapping("list")
     public Mono<String> showProductsListPage(@RequestParam(name = "filter", required = false) String filter,
-                                             @RequestParam(name = "page", defaultValue = "0") Integer page,
-                                             @RequestParam(name = "size", defaultValue = "10") Integer size,
+                                             @RequestParam(name = "page", defaultValue = "0") Integer pageNumber,
+                                             @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
                                              Model model) {
-        return this.productClient.findAllProducts(filter, page, size)
-                .collectList()
-                .doOnNext(products -> {
-                    model.addAttribute("products", products);
-                    model.addAttribute("filter", filter);
-                    log.info("Retrieved product list with filter: {}", filter);
-                })
-                .thenReturn("customer/products/list")
-                .doOnError(error -> log.error("Error retrieving product list", error));
+        return this.productService.findAllProducts(filter, pageNumber, pageSize)
+                .doOnNext(page -> model.addAttribute("products", page.getContent())
+                        .addAttribute("filter", filter)
+                        .addAttribute("page", page.getNumber())
+                        .addAttribute("size", page.getSize()))
+                .thenReturn("customer/products/list");
     }
 
     @GetMapping("favourites")
     public Mono<String> showFavouriteProductsPage(@RequestParam(name = "filter", required = false) String filter,
+                                                  @RequestParam(name = "page", defaultValue = "0") Integer pageNumber,
+                                                  @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
                                                   Model model) {
-        return this.favouriteProductClient.findAllFavouriteProducts()
-                .map(FavouriteProduct::productId)
+        return this.favouriteProductService.findAllFavouriteProducts(filter, pageNumber, pageSize)
                 .collectList()
-                .flatMap(favouriteProducts -> this.productClient.findAllProducts(filter, null, null)
-                        .filter(product -> favouriteProducts.contains(product.id()))
-                        .collectList()
-                        .doOnNext(products -> {
-                            model.addAttribute("products", products);
-                            model.addAttribute("filter", filter);
-                            log.info("Retrieved favourite products with filter: {}", filter);
-                        }))
-                .thenReturn("customer/products/favourites")
-                .doOnError(error -> log.error("Error retrieving favourite products", error));
+                .doOnNext(products -> model.addAttribute("products", products)
+                        .addAttribute("filter", filter))
+                .thenReturn("customer/products/favourites");
     }
 }

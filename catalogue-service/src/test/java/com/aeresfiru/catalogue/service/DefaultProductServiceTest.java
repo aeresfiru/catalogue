@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,16 +61,17 @@ class DefaultProductServiceTest {
     void findAllProducts_WithFilter_ReturnsFilteredProducts() {
         // given
         var products = List.of(new Product(1, "filtered", "details"));
-        doReturn(products).when(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%");
+        var pageable = Pageable.ofSize(10);
+        doReturn(new PageImpl<>(products)).when(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%", pageable);
 
         // when
-        var result = this.productService.findAllProducts("filter");
+        var result = this.productService.findAllProducts("filter", pageable);
 
         // then
         assertThat(result).isNotEmpty()
                 .containsExactly(new Product(1, "filtered", "details"));
 
-        verify(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%");
+        verify(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%", pageable);
         verifyNoMoreInteractions(this.productRepository);
     }
 
@@ -78,10 +81,11 @@ class DefaultProductServiceTest {
         var products = List.of(
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2"));
-        doReturn(products).when(this.productRepository).findAll();
+        var pageable = Pageable.ofSize(10);
+        doReturn(new PageImpl<>(products)).when(this.productRepository).findAll(pageable);
 
         // when
-        var result = this.productService.findAllProducts(null);
+        var result = this.productService.findAllProducts(null, pageable);
 
         // then
         assertThat(result).isNotEmpty().containsExactlyInAnyOrder(
@@ -89,7 +93,7 @@ class DefaultProductServiceTest {
                 new Product(2, "title#2", "details#2")
         );
 
-        verify(this.productRepository).findAll();
+        verify(this.productRepository).findAll(pageable);
         verifyNoMoreInteractions(this.productRepository);
     }
 

@@ -3,11 +3,7 @@ package com.aeresfiru.catalogue.controller;
 import com.aeresfiru.catalogue.service.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,8 +27,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
         String errorMessage = this.getMessage("catalogue.errors.400.title", request.getLocale());
-        List<String> errors = this.getErrors(ex, request);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, errorMessage);
+        var errors = this.getErrors(ex, request);
+        var problemDetail = ProblemDetail.forStatusAndDetail(status, errorMessage);
         problemDetail.setStatus(status.value());
         problemDetail.setProperty("errors", errors);
         return ResponseEntity.status(status).headers(headers).body(problemDetail);
@@ -41,7 +37,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ProblemDetail handleProductNotFoundException(ProductNotFoundException ex, Locale locale) {
         String errorMessage = this.getMessage(ex.getMessage(), locale);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, errorMessage);
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, errorMessage);
         problemDetail.setTitle(getMessage("catalogue.errors.404.title", locale));
         return problemDetail;
     }
@@ -49,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(Exception ex, Locale locale) {
         String errorMessage = this.getMessage("catalogue.errors.500.detail", locale);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage);
         problemDetail.setTitle(getMessage("catalogue.errors.500.title", locale));
         return problemDetail;
     }

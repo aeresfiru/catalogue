@@ -4,8 +4,10 @@ import com.aeresfiru.feedback.entity.FavouriteProduct;
 import com.aeresfiru.feedback.repository.FavouriteProductRepository;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class FavouriteProductServiceImpl implements FavouriteProductService {
 
     private final FavouriteProductRepository repository;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     @Override
     public Mono<FavouriteProduct> addProductToFavourites(CreateFavouriteProductRequest request, String userId) {
@@ -27,13 +30,21 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
     }
 
     @Override
-    public Flux<FavouriteProduct> findFavouriteProducts(String userId) {
-        return this.repository.findAllByUserId(userId);
+    public Mono<PageImpl<FavouriteProduct>> findFavouriteProducts(String userId, Pageable pageable) {
+        return this.repository.findAllByUserId(userId, pageable)
+                .collectList()
+                .zipWith(this.repository.countAllByUserId(userId))
+                .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
     }
 
     @Override
     public Mono<FavouriteProduct> findFavouriteProductByProduct(Integer productId, String userId) {
         return this.repository.findByProductIdAndUserId(productId, userId);
+    }
+
+    @Override
+    public Mono<Long> countAll() {
+        return this.repository.count();
     }
 
     private Mono<FavouriteProduct> mapToFavouriteProduct(CreateFavouriteProductRequest req, String userId) {

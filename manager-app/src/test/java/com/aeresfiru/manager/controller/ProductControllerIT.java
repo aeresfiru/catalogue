@@ -1,7 +1,6 @@
 package com.aeresfiru.manager.controller;
 
 import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -14,12 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import wiremock.org.apache.hc.client5.http.impl.Wire;
 
-import java.util.List;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 

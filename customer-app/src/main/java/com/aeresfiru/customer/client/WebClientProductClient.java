@@ -1,15 +1,14 @@
 package com.aeresfiru.customer.client;
 
 import com.aeresfiru.customer.entity.Product;
+import com.aeresfiru.shared.client.PageApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -24,13 +23,19 @@ public class WebClientProductClient implements ProductClient {
     private final ErrorHandler errorHandler;
 
     @Override
-    public Flux<Product> findAllProducts(String filter, Integer page, Integer size) {
-        return this.productWebClient.get()
-                .uri(baseUri + "?filter={filter}", filter)
+    public Mono<PageApiResponse<Product>> findAllProducts(String filter, Integer page, Integer size) {
+        return productWebClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(baseUri)
+                        .queryParam("filter", filter)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response -> errorHandler.handleServerError(response.bodyToMono(ProblemDetail.class)))
-                .bodyToFlux(Product.class)
+                .bodyToMono(new ParameterizedTypeReference<PageApiResponse<Product>>() {
+                })
                 .doOnError(ex -> log.error("Error retrieving all products with filter: {}", filter, ex));
     }
 

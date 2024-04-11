@@ -26,7 +26,9 @@ public class WebClientFavouriteProductClient implements FavouriteProductClient {
     @Override
     public Flux<FavouriteProduct> findAllFavouriteProducts() {
         return feedbackWebClient.get()
-                .uri(BASE_URI)
+                .uri(uriBuilder -> uriBuilder
+                        .path(BASE_URI)
+                        .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response -> errorHandler.handleServerError(response.bodyToMono(ProblemDetail.class)))

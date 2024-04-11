@@ -3,18 +3,13 @@ package com.aeresfiru.manager.controller;
 
 import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
-import com.aeresfiru.manager.client.exception.ClientEntityNotFoundException;
 import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
 import com.aeresfiru.shared.request.UpdateProductRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.BindException;
 
 @RequiredArgsConstructor
 @Controller

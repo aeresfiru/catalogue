@@ -1,8 +1,5 @@
 package com.aeresfiru.customer.controller;
 
-import com.aeresfiru.customer.client.FavouriteProductClient;
-import com.aeresfiru.customer.client.ProductClient;
-import com.aeresfiru.customer.client.ProductReviewClient;
 import com.aeresfiru.customer.client.exception.ClientBadRequestException;
 import com.aeresfiru.customer.client.exception.ClientEntityNotFoundException;
 import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
@@ -10,6 +7,9 @@ import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
 import com.aeresfiru.customer.entity.FavouriteProduct;
 import com.aeresfiru.customer.entity.Product;
 import com.aeresfiru.customer.entity.ProductReview;
+import com.aeresfiru.customer.service.FavouriteProductService;
+import com.aeresfiru.customer.service.ProductReviewService;
+import com.aeresfiru.customer.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,13 +33,13 @@ import static org.mockito.Mockito.*;
 class ProductControllerTest {
 
     @Mock
-    ProductClient productClient;
+    ProductService productService;
 
     @Mock
-    FavouriteProductClient favouriteProductClient;
+    FavouriteProductService favouriteProductService;
 
     @Mock
-    ProductReviewClient productReviewClient;
+    ProductReviewService productReviewService;
 
     @InjectMocks
     ProductController controller;
@@ -48,7 +48,7 @@ class ProductControllerTest {
     void product_ProductExists_ReturnsNotEmptyMono() {
         // given
         var product = new Product(1, "Product Title", "Product Details");
-        doReturn(Mono.just(product)).when(this.productClient).findProduct(1);
+        doReturn(Mono.just(product)).when(this.productService).findProduct(1);
 
         // when
         StepVerifier.create(this.controller.product(1))
@@ -63,7 +63,7 @@ class ProductControllerTest {
         // given
         var problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         doReturn(Mono.error(new ClientEntityNotFoundException(problemDetail)))
-                .when(this.productClient).findProduct(1);
+                .when(this.productService).findProduct(1);
 
         // when
         StepVerifier.create(this.controller.product(1))
@@ -77,28 +77,24 @@ class ProductControllerTest {
     @Test
     void isFavourite_ProductInFavourites_ReturnsTrue() {
         // given
-        doReturn(Mono.just(new FavouriteProduct("0cef5fa8-ca43-424e-be58-fe94c85b7d61", 1)))
-                .when(this.favouriteProductClient).findFavouriteProductByProductId(1);
+        doReturn(Mono.just(true)).when(this.favouriteProductService).isProductInFavourites(1);
 
         // when
         StepVerifier.create(this.controller.isFavourite(1))
                 // then
                 .expectNext(true)
-                .expectComplete()
-                .verify();
+                .verifyComplete();
     }
 
     @Test
     void isFavourite_ProductNotInFavourites_ReturnsFalse() {
         // given
-        doReturn(Mono.empty()).when(this.favouriteProductClient).findFavouriteProductByProductId(1);
+        doReturn(Mono.just(false)).when(this.favouriteProductService).isProductInFavourites(1);
 
         // when
         StepVerifier.create(this.controller.isFavourite(1))
-                // then
                 .expectNext(false)
-                .expectComplete()
-                .verify();
+                .verifyComplete();
     }
 
     @Test
@@ -108,7 +104,7 @@ class ProductControllerTest {
                         new ProductReview("cba6250c-b3d0-4bf1-b546-55960196f1d7", 1, 5, "review#1"),
                         new ProductReview("1b2fa64d-d798-488a-991e-47c0c52a816a", 1, 4, "review#2")
                 ))
-        ).when(this.productReviewClient).findProductReviewsByProductId(1);
+        ).when(this.productReviewService).findProductReviews(1);
 
         // when
         StepVerifier.create(this.controller.productReviews(1))
@@ -125,7 +121,7 @@ class ProductControllerTest {
     void productReviews_ProductNotFound_Returns404() {
         // given
         doReturn(Flux.error(new ClientEntityNotFoundException(ProblemDetail.forStatus(HttpStatus.NOT_FOUND))))
-                .when(this.productReviewClient).findProductReviewsByProductId(1);
+                .when(this.productReviewService).findProductReviews(1);
 
         // when
         StepVerifier.create(this.controller.productReviews(1))
@@ -133,9 +129,9 @@ class ProductControllerTest {
                 .expectError(ClientEntityNotFoundException.class)
                 .verify();
 
-        verify(this.productReviewClient).findProductReviewsByProductId(1);
-        verifyNoMoreInteractions(this.productReviewClient);
-        verifyNoInteractions(this.productClient, this.favouriteProductClient);
+        verify(this.productReviewService).findProductReviews(1);
+        verifyNoMoreInteractions(this.productReviewService);
+        verifyNoInteractions(this.productService, this.favouriteProductService);
     }
 
     @Test
@@ -151,7 +147,7 @@ class ProductControllerTest {
     void addProductToFavourites_RequestIsValid_ReturnsProductPage() {
         // given
         doReturn(Mono.just(new FavouriteProduct("cba6250c-b3d0-4bf1-b546-55960196f1d7", 1)))
-                .when(this.favouriteProductClient).addProductToFavourites(new CreateFavouriteProductRequest(1));
+                .when(this.favouriteProductService).addProductToFavourites(new CreateFavouriteProductRequest(1));
 
         // when
         StepVerifier.create(this.controller.addProductToFavourites(1))
@@ -159,16 +155,16 @@ class ProductControllerTest {
                 .expectNext("redirect:/customer/products/1")
                 .verifyComplete();
 
-        verify(this.favouriteProductClient).addProductToFavourites(new CreateFavouriteProductRequest(1));
-        verifyNoMoreInteractions(this.favouriteProductClient);
-        verifyNoInteractions(this.productClient, this.productClient);
+        verify(this.favouriteProductService).addProductToFavourites(new CreateFavouriteProductRequest(1));
+        verifyNoMoreInteractions(this.favouriteProductService);
+        verifyNoInteractions(this.productService, this.productService);
     }
 
     @Test
     void addProductToFavourites_RequestIsInvalid_RedirectsToProductPage() {
         // given
         doReturn(Mono.error(new ClientBadRequestException("title", null, Collections.singletonList("description"))))
-                .when(this.favouriteProductClient).addProductToFavourites(new CreateFavouriteProductRequest(1));
+                .when(this.favouriteProductService).addProductToFavourites(new CreateFavouriteProductRequest(1));
 
         // when
         StepVerifier.create(this.controller.addProductToFavourites(1))
@@ -177,15 +173,15 @@ class ProductControllerTest {
                         && e.getErrors().contains("description"))
                 .verify();
 
-        verify(this.favouriteProductClient).addProductToFavourites(new CreateFavouriteProductRequest(1));
-        verifyNoMoreInteractions(this.favouriteProductClient);
-        verifyNoInteractions(this.productClient, this.productClient);
+        verify(this.favouriteProductService).addProductToFavourites(new CreateFavouriteProductRequest(1));
+        verifyNoMoreInteractions(this.favouriteProductService);
+        verifyNoInteractions(this.productService, this.productService);
     }
 
     @Test
     void removeProductFromFavourites_RedirectsToProductPage() {
         // given
-        doReturn(Mono.empty()).when(this.favouriteProductClient).removeProductFromFavourites(1);
+        doReturn(Mono.empty()).when(this.favouriteProductService).removeProductFromFavourites(1);
 
         // when
         StepVerifier.create(this.controller.removeProductFromFavourites(1))
@@ -193,9 +189,9 @@ class ProductControllerTest {
                 .expectNext("redirect:/customer/products/1")
                 .verifyComplete();
 
-        verify(this.favouriteProductClient).removeProductFromFavourites(1);
-        verifyNoMoreInteractions(this.favouriteProductClient);
-        verifyNoInteractions(this.productClient, this.productReviewClient);
+        verify(this.favouriteProductService).removeProductFromFavourites(1);
+        verifyNoMoreInteractions(this.favouriteProductService);
+        verifyNoInteractions(this.productService, this.productReviewService);
     }
 
     @Test
@@ -205,18 +201,18 @@ class ProductControllerTest {
         var response = new MockServerHttpResponse();
 
         doReturn(Mono.just(new ProductReview("86efa22c-cbae-11ee-ab01-679baf165fb7", 1, 3, "review")))
-                .when(this.productReviewClient).createProductReview(new CreateProductReviewRequest(1, 3, "review"));
+                .when(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, 3, "review"));
 
         // when
         StepVerifier.create(this.controller.createReview(Mono.just(new Product(1, "Title", "Description")),
-                        new CreateProductReviewRequest(1, 3, "review"), model, response))
+                        Mono.just(new CreateProductReviewRequest(1, 3, "review")), model, response))
                 // then
                 .expectNext("redirect:/customer/products/1")
                 .verifyComplete();
 
-        verify(this.productReviewClient).createProductReview(new CreateProductReviewRequest(1, 3, "review"));
-        verifyNoMoreInteractions(this.productReviewClient);
-        verifyNoInteractions(this.productClient, this.favouriteProductClient);
+        verify(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, 3, "review"));
+        verifyNoMoreInteractions(this.productReviewService);
+        verifyNoInteractions(this.productService, this.favouriteProductService);
     }
 
     @Test
@@ -226,12 +222,12 @@ class ProductControllerTest {
         var response = new MockServerHttpResponse();
 
         doReturn(Mono.error(new ClientBadRequestException("title", null, Collections.singletonList("rating null"))))
-                .when(this.productReviewClient).createProductReview(new CreateProductReviewRequest(1, null, null));
+                .when(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, null, null));
 
         // when
         StepVerifier.create(this.controller.createReview(
                         Mono.just(new Product(1, "title", "description")),
-                        new CreateProductReviewRequest(1, null, null), model, response))
+                        Mono.just(new CreateProductReviewRequest(1, null, null)), model, response))
                 // then
                 .expectNext("customer/products/product")
                 .verifyComplete();
@@ -241,7 +237,7 @@ class ProductControllerTest {
         assertThat(model.getAttribute("payload")).isEqualTo(new CreateProductReviewRequest(1, null, null));
         assertThat(model.getAttribute("errors")).isEqualTo(Collections.singletonList("rating null"));
 
-        verify(this.productReviewClient).createProductReview(new CreateProductReviewRequest(1, null, null));
-        verifyNoMoreInteractions(this.productReviewClient, this.favouriteProductClient);
+        verify(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, null, null));
+        verifyNoMoreInteractions(this.productReviewService, this.favouriteProductService);
     }
 }

@@ -1,6 +1,5 @@
 package com.aeresfiru.feedback.controller;
 
-import com.aeresfiru.feedback.controller.resource.ProductReviewResource;
 import com.aeresfiru.feedback.entity.ProductReview;
 import com.aeresfiru.feedback.service.ProductReviewService;
 import com.aeresfiru.feedback.service.dto.CreateProductReviewRequest;
@@ -46,9 +45,9 @@ public class ProductReviewControllerTest {
         StepVerifier.create(this.controller.findProductReviews(1))
                 // then
                 .expectNext(
-                        new ProductReviewResource("2dbcec0b-686a-4a96-be5a-795b4de19872", 1, 5,
+                        new ProductReview(UUID.fromString("2dbcec0b-686a-4a96-be5a-795b4de19872"), 1, 5,
                                 "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
-                        new ProductReviewResource("b45be946-6e85-43f8-bcc8-c6927f382d36", 1, 4,
+                        new ProductReview(UUID.fromString("b45be946-6e85-43f8-bcc8-c6927f382d36"), 1, 4,
                                 "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36")
                 )
                 .verifyComplete();
@@ -77,7 +76,7 @@ public class ProductReviewControllerTest {
                 // then
                 .expectNext(ResponseEntity
                         .created(URI.create("http://localhost/feedback-api/v1/product-reviews/" + reviewId))
-                        .body(new ProductReviewResource(reviewId, 1, 4, "review", userId)))
+                        .body(new ProductReview(UUID.fromString(reviewId), 1, 4, "review", userId)))
                 .verifyComplete();
 
         verify(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, 4, "review"), userId);

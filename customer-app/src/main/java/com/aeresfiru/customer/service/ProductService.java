@@ -1,10 +1,10 @@
-package com.aeresfiru.customer.client;
+package com.aeresfiru.customer.service;
 
 import com.aeresfiru.customer.entity.Product;
 import com.aeresfiru.shared.client.PageApiResponse;
 import reactor.core.publisher.Mono;
 
-public interface ProductClient {
+public interface ProductService {
 
     Mono<PageApiResponse<Product>> findAllProducts(String filter, Integer page, Integer size);
 
