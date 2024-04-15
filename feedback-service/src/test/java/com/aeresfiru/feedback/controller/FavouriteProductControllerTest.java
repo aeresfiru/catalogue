@@ -51,7 +51,7 @@ public class FavouriteProductControllerTest {
         )).when(this.favouriteProductService).findFavouriteProducts(userId, PageRequest.of(0, 10));
 
         // when
-        StepVerifier.create(this.controller.findFavouriteProducts(Mono.just(token), 0, 10))
+        StepVerifier.create(this.controller.findFavouriteProducts(0, 10, Mono.just(token)))
                 // then
                 .expectNext(new PageImpl<>(List.of(
                         new FavouriteProduct(UUID.fromString(favouriteProductId_1), 1, userId),
@@ -78,7 +78,7 @@ public class FavouriteProductControllerTest {
                 .when(this.favouriteProductService).findFavouriteProductByProduct(1, userId);
 
         // when
-        StepVerifier.create(this.controller.findFavouriteProductByProductId(Mono.just(token), 1))
+        StepVerifier.create(this.controller.findFavouriteProductByProductId(1, Mono.just(token)))
                 // then
                 .expectNext(new FavouriteProduct(UUID.fromString(favouriteProductId), 1, userId))
                 .verifyComplete();
@@ -104,8 +104,9 @@ public class FavouriteProductControllerTest {
                 .addProductToFavourites(new CreateFavouriteProductRequest(1), userId);
 
         // when
-        StepVerifier.create(this.controller.addProductToFavourites(Mono.just(token),
+        StepVerifier.create(this.controller.addProductToFavourites(
                         Mono.just(new CreateFavouriteProductRequest(1)),
+                        Mono.just(token),
                         UriComponentsBuilder.fromUriString("http://localhost")))
                 // then
                 .expectNext(ResponseEntity
@@ -133,7 +134,7 @@ public class FavouriteProductControllerTest {
                 .removeProductFromFavourites(1, userId);
 
         // when
-        StepVerifier.create(this.controller.removeProductFromFavourites(Mono.just(token), 1))
+        StepVerifier.create(this.controller.removeProductFromFavourites(1, Mono.just(token)))
                 // then
                 .expectNext(ResponseEntity.noContent().build())
                 .verifyComplete();

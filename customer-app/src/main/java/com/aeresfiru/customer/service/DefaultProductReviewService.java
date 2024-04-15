@@ -2,7 +2,7 @@ package com.aeresfiru.customer.service;
 
 import com.aeresfiru.customer.client.ProductReviewClient;
 import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
-import com.aeresfiru.customer.entity.ProductReview;
+import com.aeresfiru.customer.client.payload.ProductReview;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

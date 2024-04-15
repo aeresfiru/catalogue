@@ -1,7 +1,7 @@
 package com.aeresfiru.customer.client;
 
-import com.aeresfiru.customer.entity.Product;
-import com.aeresfiru.shared.client.PageApiResponse;
+import com.aeresfiru.customer.client.payload.PageResponse;
+import com.aeresfiru.customer.client.payload.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,7 +23,7 @@ public class WebClientProductClient implements ProductClient {
     private final ErrorHandler errorHandler;
 
     @Override
-    public Mono<PageApiResponse<Product>> findAllProducts(String filter, Integer page, Integer size) {
+    public Mono<PageResponse<Product>> findAllProducts(String filter, Integer page, Integer size) {
         return productWebClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(baseUri)
@@ -34,8 +34,7 @@ public class WebClientProductClient implements ProductClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::is5xxServerError,
                         response -> errorHandler.handleServerError(response.bodyToMono(ProblemDetail.class)))
-                .bodyToMono(new ParameterizedTypeReference<PageApiResponse<Product>>() {
-                })
+                .bodyToMono(new ParameterizedTypeReference<PageResponse<Product>>() {})
                 .doOnError(ex -> log.error("Error retrieving all products with filter: {}", filter, ex));
     }
 

@@ -3,10 +3,12 @@ package com.aeresfiru.feedback.service;
 import com.aeresfiru.feedback.entity.ProductReview;
 import com.aeresfiru.feedback.repository.ProductReviewRepository;
 import com.aeresfiru.feedback.service.dto.CreateProductReviewRequest;
+import com.aeresfiru.feedback.service.mapper.ProductReviewMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,6 +26,9 @@ class ProductReviewServiceImplTest {
 
     @Mock
     ProductReviewRepository productReviewRepository;
+
+    @Spy
+    ProductReviewMapper mapper;
 
     @InjectMocks
     ProductReviewServiceImpl service;

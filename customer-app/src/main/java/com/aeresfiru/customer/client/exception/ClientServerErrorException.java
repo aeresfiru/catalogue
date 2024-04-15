@@ -1,12 +1,10 @@
 package com.aeresfiru.customer.client.exception;
 
-import lombok.Getter;
 import org.springframework.http.ProblemDetail;
 
-@Getter
 public class ClientServerErrorException extends RuntimeException {
 
-    private final ProblemDetail problemDetail;
+    private ProblemDetail problemDetail;
 
     public ClientServerErrorException(ProblemDetail problemDetail) {
         this.problemDetail = problemDetail;
@@ -25,5 +23,9 @@ public class ClientServerErrorException extends RuntimeException {
     public ClientServerErrorException(Throwable cause, ProblemDetail problemDetail) {
         super(cause);
         this.problemDetail = problemDetail;
+    }
+
+    public ProblemDetail getProblemDetail() {
+        return problemDetail;
     }
 }

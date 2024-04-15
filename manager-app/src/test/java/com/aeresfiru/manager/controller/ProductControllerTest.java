@@ -3,8 +3,8 @@ package com.aeresfiru.manager.controller;
 import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
 import com.aeresfiru.manager.client.exception.ClientEntityNotFoundException;
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
+import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +15,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ui.ConcurrentModel;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -113,9 +115,9 @@ class ProductControllerTest {
         var request = new UpdateProductRequest("", null);
         var model = new ConcurrentModel();
         var response = new MockHttpServletResponse();
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        var errors = Collections.singletonList("error");
 
-        doThrow(new ClientBadRequestException(problemDetail))
+        doThrow(new ClientBadRequestException(errors))
                 .when(this.productClient).updateProduct(request, 1);
 
         // when
@@ -123,7 +125,7 @@ class ProductControllerTest {
 
         // then
         assertThat(result).isEqualTo("catalogue/products/edit");
-        assertThat(model.containsAttribute("problemDetail")).isTrue();
+        assertThat(model.containsAttribute("errors")).isTrue();
         verify(this.productClient).updateProduct(request, 1);
         verifyNoMoreInteractions(this.productClient);
     }

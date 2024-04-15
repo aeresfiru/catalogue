@@ -1,4 +1,6 @@
 package com.aeresfiru.customer.client.payload;
 
-public record CreateFavouriteProductRequest(Integer productId) {
+import java.io.Serializable;
+
+public record CreateFavouriteProductRequest(Integer productId) implements Serializable {
 }

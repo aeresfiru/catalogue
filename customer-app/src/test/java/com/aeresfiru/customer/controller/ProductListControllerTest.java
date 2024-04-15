@@ -1,9 +1,9 @@
 package com.aeresfiru.customer.controller;
 
-import com.aeresfiru.customer.entity.Product;
+import com.aeresfiru.customer.client.payload.PageResponse;
+import com.aeresfiru.customer.client.payload.Product;
 import com.aeresfiru.customer.service.FavouriteProductService;
 import com.aeresfiru.customer.service.ProductService;
-import com.aeresfiru.shared.client.PageApiResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,10 +35,10 @@ class ProductListControllerTest {
     void showProductsListPage_RequestIsValid_ReturnsProductListPage() {
         // given
         var model = new ConcurrentModel();
-        doReturn(Mono.just(new PageApiResponse<>(List.of(
+        doReturn(Mono.just(new PageResponse<>(List.of(
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2")
-        ), 10, 0, 2, 1))).when(this.productService).findAllProducts("filter", 0, 10);
+        ), 10, 0, 2))).when(this.productService).findAllProducts("filter", 0, 10);
 
         // when
         StepVerifier.create(this.controller.showProductsListPage("filter", 0, 10, model))

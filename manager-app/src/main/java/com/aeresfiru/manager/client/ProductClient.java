@@ -1,8 +1,8 @@
 package com.aeresfiru.manager.client;
 
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
+import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 
 import java.util.List;
 

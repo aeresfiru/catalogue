@@ -3,9 +3,9 @@ package com.aeresfiru.manager.client;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
 import com.aeresfiru.manager.client.exception.ClientEntityNotFoundException;
 import com.aeresfiru.manager.client.exception.ClientServerErrorException;
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
+import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -14,6 +14,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -88,11 +89,22 @@ public class RestClientProductClient implements ProductClient {
         } catch (HttpClientErrorException.BadRequest ex) {
             log.error("Request failed, server return bad request: {}", ex.getMessage());
             var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
-            throw new ClientBadRequestException(problemDetail);
+            throw new ClientBadRequestException(extractErrors(problemDetail));
         } catch (HttpClientErrorException ex) {
             log.error("Request failed, server return unhandled exception: {}", ex.getMessage());
             var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
             throw new ClientServerErrorException(problemDetail);
         }
+    }
+
+    private List<String> extractErrors(ProblemDetail error) {
+        if (error != null && error.getProperties() != null && error.getProperties().containsKey("errors")) {
+            return ((List<?>) error.getProperties().get("errors")).stream()
+                    .filter(String.class::isInstance)
+                    .map(String::valueOf)
+                    .toList();
+        }
+        log.error("Validation error occurred, but no error messages found: {}", error);
+        return Collections.emptyList();
     }
 }

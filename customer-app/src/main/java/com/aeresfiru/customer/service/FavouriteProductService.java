@@ -1,8 +1,8 @@
 package com.aeresfiru.customer.service;
 
 import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
-import com.aeresfiru.customer.entity.FavouriteProduct;
-import com.aeresfiru.customer.entity.Product;
+import com.aeresfiru.customer.client.payload.FavouriteProduct;
+import com.aeresfiru.customer.client.payload.Product;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

@@ -19,11 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.aeresfiru</groupId>
-            <artifactId>shared</artifactId>
-            <version>1.10-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-resolver-dns-native-macos</artifactId>
             <scope>runtime</scope>

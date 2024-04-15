@@ -9,7 +9,6 @@
     <version>1.10-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>shared</module>
         <module>manager-app</module>
         <module>catalogue-service</module>
         <module>customer-app</module>

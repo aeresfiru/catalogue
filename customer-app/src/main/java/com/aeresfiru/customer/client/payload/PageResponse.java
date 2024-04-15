@@ -1,7 +1,8 @@
 package com.aeresfiru.customer.client.payload;
 
 import java.io.Serializable;
+import java.util.List;
 
-public record CreateProductReviewRequest(Integer productId, Integer rating, String review)
+public record PageResponse<T>(List<T> content, int page, int size, long totalElements)
         implements Serializable {
 }

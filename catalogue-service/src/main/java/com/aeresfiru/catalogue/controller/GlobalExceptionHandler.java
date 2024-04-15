@@ -2,6 +2,7 @@ package com.aeresfiru.catalogue.controller;
 
 import com.aeresfiru.catalogue.service.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.*;
 import org.springframework.validation.ObjectError;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final MessageSource messageSource;
@@ -53,7 +55,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private List<String> getErrors(MethodArgumentNotValidException ex, WebRequest request) {
         return ex.getAllErrors().stream()
                 .map(ObjectError::getDefaultMessage)
-                .map(msg -> getMessage(msg, request.getLocale()))
+                .map(msg -> this.getMessage(msg, request.getLocale()))
                 .collect(Collectors.toList());
     }
 

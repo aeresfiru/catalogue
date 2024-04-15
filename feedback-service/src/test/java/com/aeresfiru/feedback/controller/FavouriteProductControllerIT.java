@@ -1,7 +1,7 @@
 package com.aeresfiru.feedback.controller;
 
 import com.aeresfiru.feedback.entity.FavouriteProduct;
-import com.aeresfiru.shared.client.PageApiResponse;
+import com.aeresfiru.feedback.service.dto.RestPage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -60,7 +59,7 @@ class FavouriteProductControllerIT {
                 .expectAll(
                         spec -> spec.expectStatus().isOk(),
                         spec -> spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        spec -> spec.expectBodyList(new ParameterizedTypeReference<PageApiResponse<FavouriteProduct>>() {})
+                        spec -> spec.expectBody(RestPage.class)
                 );
     }
 

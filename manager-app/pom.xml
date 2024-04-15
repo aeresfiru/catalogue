@@ -19,11 +19,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.aeresfiru</groupId>
-            <artifactId>shared</artifactId>
-            <version>1.10-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

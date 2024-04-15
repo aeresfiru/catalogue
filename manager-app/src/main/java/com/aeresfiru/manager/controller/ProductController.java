@@ -3,8 +3,8 @@ package com.aeresfiru.manager.controller;
 
 import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
+import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -43,7 +43,7 @@ public class ProductController {
         } catch (ClientBadRequestException ex) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("payload", request);
-            model.addAttribute("problemDetail", ex.getProblemDetail());
+            model.addAttribute("errors", ex.getErrors());
             return "catalogue/products/edit";
         }
     }

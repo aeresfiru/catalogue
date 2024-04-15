@@ -2,9 +2,9 @@ package com.aeresfiru.catalogue.service;
 
 import com.aeresfiru.catalogue.entity.Product;
 import com.aeresfiru.catalogue.repository.ProductRepository;
+import com.aeresfiru.catalogue.service.dto.CreateProductRequest;
+import com.aeresfiru.catalogue.service.dto.UpdateProductRequest;
 import com.aeresfiru.catalogue.service.mapper.ProductMapper;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

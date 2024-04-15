@@ -5,14 +5,13 @@ import com.aeresfiru.catalogue.controller.resource.ProductResourceAssembler;
 import com.aeresfiru.catalogue.entity.Product;
 import com.aeresfiru.catalogue.service.ProductNotFoundException;
 import com.aeresfiru.catalogue.service.ProductService;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.catalogue.service.dto.CreateProductRequest;
+import com.aeresfiru.catalogue.service.dto.UpdateProductRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +26,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ComponentScan("com.aeresfiru.catalogue.controller")
 class ProductControllerTest {
 
     @Mock

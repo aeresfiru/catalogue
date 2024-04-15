@@ -1,8 +1,8 @@
 package com.aeresfiru.catalogue.service.mapper;
 
 import com.aeresfiru.catalogue.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.catalogue.service.dto.CreateProductRequest;
+import com.aeresfiru.catalogue.service.dto.UpdateProductRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

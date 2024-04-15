@@ -26,12 +26,11 @@ public class ProductReviewController {
 
     @PostMapping
     public Mono<ResponseEntity<ProductReview>> createProductReview(
-            Mono<JwtAuthenticationToken> authenticationTokenMono,
-            @Valid @RequestBody Mono<CreateProductReviewRequest> request,
+            Mono<JwtAuthenticationToken> jwtAuthTokenMono,
+            @Valid @RequestBody Mono<CreateProductReviewRequest> requestMono,
             UriComponentsBuilder builder) {
-        return Mono.zip(authenticationTokenMono, request)
-                .flatMap(tuple ->
-                        this.productReviewService.createProductReview(tuple.getT2(), getUserId(tuple.getT1())))
+        return Mono.zip(jwtAuthTokenMono.map(this::extractUserId), requestMono)
+                .flatMap(t -> this.productReviewService.createProductReview(t.getT2(), t.getT1()))
                 .map(review -> ResponseEntity
                         .created(builder
                                 .replacePath("/feedback-api/v1/product-reviews/{reviewId}")
@@ -39,7 +38,7 @@ public class ProductReviewController {
                         .body(review));
     }
 
-    private static String getUserId(JwtAuthenticationToken token) {
-        return token.getToken().getSubject();
+    private String extractUserId(JwtAuthenticationToken jwtAuthenticationToken) {
+        return jwtAuthenticationToken.getToken().getSubject();
     }
 }

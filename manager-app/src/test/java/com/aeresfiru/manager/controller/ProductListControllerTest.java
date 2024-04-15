@@ -2,19 +2,18 @@ package com.aeresfiru.manager.controller;
 
 import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ui.ConcurrentModel;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,10 +55,9 @@ public class ProductListControllerTest {
         var request = new CreateProductRequest("", "New product details");
         var model = new ConcurrentModel();
         var response = new MockHttpServletResponse();
-        var problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setProperty("errors", List.of("Title must not be blank"));
+        var errors = Collections.singletonList("error");
 
-        doThrow(new ClientBadRequestException(problemDetail)).when(this.productClient)
+        doThrow(new ClientBadRequestException(errors)).when(this.productClient)
                 .createProduct(new CreateProductRequest("", "New product details"));
 
         // when
@@ -67,7 +65,7 @@ public class ProductListControllerTest {
 
         // then
         assertThat(result).isEqualTo("catalogue/products/new_product");
-        assertThat(model.containsAttribute("problemDetail")).isTrue();
+        assertThat(model.containsAttribute("errors")).isTrue();
         verify(this.productClient).createProduct(new CreateProductRequest("", "New product details"));
         verifyNoMoreInteractions(this.productClient);
     }

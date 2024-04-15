@@ -1,7 +1,7 @@
 package com.aeresfiru.manager.controller;
 
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
+import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
@@ -189,7 +189,7 @@ class ProductControllerIT {
                         status().isBadRequest(),
                         view().name("catalogue/products/edit"),
                         model().attribute("product", new Product(1, "title", "details")),
-                        model().attributeExists("problemDetail"),
+                        model().attributeExists("errors"),
                         model().attribute("payload", new UpdateProductRequest("", null))
                 );
 

@@ -1,7 +1,7 @@
 package com.aeresfiru.customer.client;
 
 import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
-import com.aeresfiru.customer.entity.FavouriteProduct;
+import com.aeresfiru.customer.client.payload.FavouriteProduct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;

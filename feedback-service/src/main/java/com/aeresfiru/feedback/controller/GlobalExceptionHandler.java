@@ -8,10 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
-import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -23,22 +21,21 @@ public class GlobalExceptionHandler {
     private final MessageSource messageSource;
 
     @ExceptionHandler(WebExchangeBindException.class)
-    public Mono<ResponseEntity<ProblemDetail>> handleWebExchangeBindException(WebExchangeBindException ex) {
-        var problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setProperty("errors", ex.getAllErrors().stream()
-                .map(MessageSourceResolvable::getDefaultMessage).toList());
+    public ResponseEntity<ProblemDetail> handleWebExchangeBindException(WebExchangeBindException ex, Locale locale) {
+        String detail = this.messageSource.getMessage("feedback.products.errors.bad_request", new Object[0], locale);
+        var errorList = ex.getAllErrors().stream().map(MessageSourceResolvable::getDefaultMessage).toList();
 
-        return Mono.just(ResponseEntity.badRequest()
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
+        problemDetail.setProperty("errors", errorList);
+
+        return ResponseEntity.badRequest()
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-                .body(problemDetail));
+                .body(problemDetail);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Mono<ProblemDetail> handleNoSuchElementException(NoSuchElementException ex,
-                                                            Locale locale) {
-        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
-                this.messageSource.getMessage(ex.getMessage(), new Object[0], locale));
-        return Mono.just(problemDetail);
+    public ProblemDetail handleNoSuchElementException(NoSuchElementException ex, Locale locale) {
+        String errorMessage = this.messageSource.getMessage(ex.getMessage(), new Object[0], locale);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, errorMessage);
     }
 }

@@ -2,11 +2,7 @@ package com.aeresfiru.customer.controller;
 
 import com.aeresfiru.customer.client.exception.ClientBadRequestException;
 import com.aeresfiru.customer.client.exception.ClientEntityNotFoundException;
-import com.aeresfiru.customer.client.payload.CreateFavouriteProductRequest;
-import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
-import com.aeresfiru.customer.entity.FavouriteProduct;
-import com.aeresfiru.customer.entity.Product;
-import com.aeresfiru.customer.entity.ProductReview;
+import com.aeresfiru.customer.client.payload.*;
 import com.aeresfiru.customer.service.FavouriteProductService;
 import com.aeresfiru.customer.service.ProductReviewService;
 import com.aeresfiru.customer.service.ProductService;
@@ -163,7 +159,7 @@ class ProductControllerTest {
     @Test
     void addProductToFavourites_RequestIsInvalid_RedirectsToProductPage() {
         // given
-        doReturn(Mono.error(new ClientBadRequestException("title", null, Collections.singletonList("description"))))
+        doReturn(Mono.error(new ClientBadRequestException(Collections.singletonList("description"))))
                 .when(this.favouriteProductService).addProductToFavourites(new CreateFavouriteProductRequest(1));
 
         // when
@@ -221,7 +217,7 @@ class ProductControllerTest {
         var model = new ConcurrentModel();
         var response = new MockServerHttpResponse();
 
-        doReturn(Mono.error(new ClientBadRequestException("title", null, Collections.singletonList("rating null"))))
+        doReturn(Mono.error(new ClientBadRequestException(Collections.singletonList("rating null"))))
                 .when(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, null, null));
 
         // when

@@ -3,10 +3,12 @@ package com.aeresfiru.feedback.service;
 import com.aeresfiru.feedback.entity.FavouriteProduct;
 import com.aeresfiru.feedback.repository.FavouriteProductRepository;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
+import com.aeresfiru.feedback.service.mapper.FavouriteProductMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.Flux;
@@ -23,6 +25,9 @@ class FavouriteProductServiceImplTest {
 
     @Mock
     FavouriteProductRepository favouriteProductRepository;
+
+    @Spy
+    FavouriteProductMapper mapper;
 
     @InjectMocks
     FavouriteProductServiceImpl service;

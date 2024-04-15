@@ -1,10 +1,7 @@
 package com.aeresfiru.customer.client.exception;
 
-import lombok.Getter;
-
 import java.util.List;
 
-@Getter
 public class ClientBadRequestException extends RuntimeException {
 
     private final List<String> errors;
@@ -18,13 +15,7 @@ public class ClientBadRequestException extends RuntimeException {
         this.errors = errors;
     }
 
-    public ClientBadRequestException(String message, Throwable cause, List<String> errors) {
-        super(message, cause);
-        this.errors = errors;
-    }
-
-    public ClientBadRequestException(Throwable cause, List<String> errors) {
-        super(cause);
-        this.errors = errors;
+    public List<String> getErrors() {
+        return errors;
     }
 }

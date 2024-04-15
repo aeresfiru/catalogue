@@ -1,8 +1,8 @@
 package com.aeresfiru.catalogue.service;
 
 import com.aeresfiru.catalogue.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
-import com.aeresfiru.shared.request.UpdateProductRequest;
+import com.aeresfiru.catalogue.service.dto.CreateProductRequest;
+import com.aeresfiru.catalogue.service.dto.UpdateProductRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

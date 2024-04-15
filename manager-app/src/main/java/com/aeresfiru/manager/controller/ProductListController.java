@@ -2,7 +2,7 @@ package com.aeresfiru.manager.controller;
 
 import com.aeresfiru.manager.client.ProductClient;
 import com.aeresfiru.manager.client.exception.ClientBadRequestException;
-import com.aeresfiru.shared.request.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.CreateProductRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -31,7 +31,7 @@ public class ProductListController {
             return "redirect:/catalogue/products/" + result.id();
         } catch (ClientBadRequestException ex) {
             model.addAttribute("payload", request);
-            model.addAttribute("problemDetail", ex.getProblemDetail());
+            model.addAttribute("errors", ex.getErrors());
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return "catalogue/products/new_product";
         }

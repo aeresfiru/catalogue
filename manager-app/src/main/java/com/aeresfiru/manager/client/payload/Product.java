@@ -1,4 +1,4 @@
-package com.aeresfiru.manager.entity;
+package com.aeresfiru.manager.client.payload;
 
 import java.io.Serializable;
 

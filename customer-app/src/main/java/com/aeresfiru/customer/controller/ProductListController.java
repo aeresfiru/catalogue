@@ -26,10 +26,10 @@ public class ProductListController {
                                              @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
                                              Model model) {
         return this.productService.findAllProducts(filter, pageNumber, pageSize)
-                .doOnNext(page -> model.addAttribute("products", page.getContent())
+                .doOnNext(page -> model.addAttribute("products", page.content())
                         .addAttribute("filter", filter)
-                        .addAttribute("page", page.getNumber())
-                        .addAttribute("size", page.getSize()))
+                        .addAttribute("page", page.page())
+                        .addAttribute("size", page.size()))
                 .thenReturn("customer/products/list");
     }
 

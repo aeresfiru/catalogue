@@ -1,7 +1,7 @@
 package com.aeresfiru.manager.controller;
 
-import com.aeresfiru.manager.entity.Product;
-import com.aeresfiru.shared.request.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.Product;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.Test;
@@ -111,7 +111,7 @@ public class ProductListControllerIT {
                         status().isBadRequest(),
                         view().name("catalogue/products/new_product"),
                         model().attribute("payload", new CreateProductRequest("", "details")),
-                        model().attributeExists("problemDetail"),
+                        model().attributeExists("errors"),
                         header().doesNotExist(HttpHeaders.LOCATION)
                 );
 
