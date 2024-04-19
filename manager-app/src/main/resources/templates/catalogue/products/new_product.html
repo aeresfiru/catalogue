@@ -1,28 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:inline="text">[[#{'product.page.create'}]]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Create Product</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/list}">&lAarr; [[#{'product.link.to_the_product_list'}]]</a>
-<h1 th:text="#{'product.page.create'}"></h1>
-<div data-th-if="${problemDetail}">
-    <h2 th:if="${problemDetail.title}" th:text="${problemDetail.title}"></h2>
-    <ul>
-        <li th:each="error: ${problemDetail.properties.get('errors')}" th:text="${error}"></li>
-    </ul>
+
+<div th:insert="fragments/header.html :: header"></div>
+
+<div class="create-container">
+    <div class="create-form-container">
+        <h1>Create Product</h1>
+
+        <div th:if="${errors}">
+            <div class="alert alert-danger" role="alert">
+                <ul class="error-list">
+                    <li th:each="error : ${errors}" th:text="${error}"></li>
+                </ul>
+            </div>
+        </div>
+
+        <form method="POST" th:action="@{/catalogue/products/create}" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="productTitle" class="form-label">Product Name</label>
+                <input th:value="${payload != null ? payload.title : ''}" type="text" name="title" class="form-control"
+                       id="productTitle" placeholder="Enter product name"
+                       required>
+            </div>
+            <div class="mb-3">
+                <label for="productDetails" class="form-label">Product Details</label>
+                <textarea th:text="${payload != null ? payload.details : ''}" name="details" class="form-control"
+                          id="productDetails" rows="3"
+                          placeholder="Enter product details" required></textarea>
+            </div>
+            <div class="row justify-between">
+                <div class="col">
+                    <a href="/catalogue/products/list" class="btn btn-secondary">Cancel</a>
+                </div>
+                <div class="col text-end">
+                    <button type="submit" class="btn btn-success btn-create">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-<form method="POST" data-th-action="@{/catalogue/products/create}">
-    <label th:inline="text">
-        [[#{'product.form.label.title'}]]<br>
-        <input type="text" name="title" data-th-value="${payload?.title}"/>
-    </label><br>
-    <label th:inline="text">
-        [[#{'product.form.label.description'}]]:<br>
-        <textarea name="details" data-th-text="${payload?.details}"></textarea>
-    </label><br>
-    <button type="submit" th:text="#{'product.form.create.button.submit'}"></button>
-</form>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 </body>
 </html>

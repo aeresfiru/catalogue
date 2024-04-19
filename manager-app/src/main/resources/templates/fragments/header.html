@@ -2,18 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Welcome to Product Manager</title>
-
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App header</title>
 </head>
 <body>
 
-<nav class="navbar sticky-top navbar-expand-lg navbar-light">
+<nav class="navbar sticky-top navbar-expand-lg navbar-light" th:fragment="header">
     <div class="container-fluid pt-0">
         <a class="navbar-brand" href="/"><i class="fas fa-font"></i>eresfiru Manager</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -34,24 +28,10 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> About</a>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3 welcome-section">
-            <h1>Welcome, Manager!</h1>
-            <p class="lead">Manage your products with our Product Manager.</p>
-            <a href="/catalogue/products/list" class="btn btn-primary">View Product List</a>
-            <a href="/catalogue/products/create" class="btn btn-success">Create New Product</a>
-        </div>
-    </div>
-</div>
-
-<script src="js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

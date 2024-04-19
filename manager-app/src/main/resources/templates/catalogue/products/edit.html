@@ -1,29 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>[[#{'product.page.update'}]] &ndash; aeresfiru</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Edit Product</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script th:src="@{/js/toast.js}"></script>
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/{productId}(productId=${product.id})}" th:inline="text">&larr;
-    [[#{'product.link.to_the_product'}]]</a>
-<h1>[[${product.title}]]</h1>
-<div data-th-if="${problemDetail}">
-    <h2 data-th-text="#{'errors.400.title'}"></h2>
-    <ul>
-        <li data-th-each="error: ${problemDetail.properties.get('errors')}" data-th-text="${error}"></li>
-    </ul>
+
+<div th:insert="fragments/header.html :: header"></div>
+
+<div class="create-container">
+
+    <div th:if="${updateMessage != null}" class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div th:replace="~{/fragments/toast :: toast('Product Updated', ${updateMessage})}"></div>
+    </div>
+
+    <div class="create-form-container">
+        <h1>Edit Product</h1>
+
+        <!-- Validation Errors -->
+        <div th:if="${errors}">
+            <div class="alert alert-danger" role="alert">
+                <ul class="error-list">
+                    <li th:each="error : ${errors}" th:text="${error}"></li>
+                </ul>
+            </div>
+        </div>
+
+        <form method="POST" th:action="@{/catalogue/products/{productId}/edit(productId=${product.id})}"
+              class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="productTitle" class="form-label">Product Name</label>
+                <input th:value="${product.title}" type="text" name="title" class="form-control" id="productTitle"
+                       placeholder="Enter product name"
+                       required>
+            </div>
+            <div class="mb-3">
+                <label for="productDetails" class="form-label">Product Details</label>
+                <textarea th:text="${product.details}" name="details" class="form-control" id="productDetails" rows="3"
+                          placeholder="Enter product details" required></textarea>
+            </div>
+            <div class="row justify-between">
+                <div class="col">
+                    <a href="/catalogue/products/list" class="btn btn-secondary">Cancel</a>
+                </div>
+                <div class="col text-end">
+                    <button type="submit" class="btn btn-success">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
-<form method="post" data-th-action="@{/catalogue/products/{productId}/edit(productId=${product.id})}">
-    <label th:inline="text">
-        [[#{'product.form.label.title'}]]<br>
-        <input type="text" name="title" data-th-value="${payload != null ? payload.title : product.title}">
-    </label><br>
-    <label th:inline="text">
-        [[#{'product.form.label.description'}]]:<br>
-        <textarea name="details" data-th-text="${payload != null ? payload.details : product.details}"></textarea>
-    </label><br>
-    <button type="submit" th:text="#{'product.form.update.button.submit'}"></button>
-</form>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 </body>
 </html>

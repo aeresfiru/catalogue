@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Welcome to Product Manager</title>
+    <title>Product Manager</title>
 
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
@@ -34,24 +34,27 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> About</a>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3 welcome-section">
-            <h1>Welcome, Manager!</h1>
-            <p class="lead">Manage your products with our Product Manager.</p>
-            <a href="/catalogue/products/list" class="btn btn-primary">View Product List</a>
-            <a href="/catalogue/products/create" class="btn btn-success">Create New Product</a>
-        </div>
-    </div>
+<div class="container mt-5">
+    <h2>About Aeresfiru Manager</h2>
+    <p>Aeresfiru Manager is my pet project. Comprehensive platform for products, enabling users to browse, leave
+        reviews, and interact with products. Built with Java Spring and other cutting-edge technologies, it offers a
+        range of tools for inventory management, sales tracking, and product analytics. Dive in, explore, and let me
+        know what you think!</p>
+
+    <h2>Contact Me</h2>
+    <ul class="list-unstyled contact-list">
+        <li><i class="fab fa-telegram"></i> <a href="#">@qjija</a></li>
+        <li><i class="fab fa-linkedin"></i> <a href="#">Aliaksandr Shtarou</a></li>
+        <li><i class="fas fa-envelope"></i> <a href="mailto:aeresfiru@gmail.com">aeresfiru@gmail.com</a></li>
+    </ul>
 </div>
 
-<script src="js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 </html>

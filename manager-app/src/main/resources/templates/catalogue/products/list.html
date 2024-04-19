@@ -2,32 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>[[#{'product.page.product_list'}]] &ndash; aeresfiru</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Product Manager</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <script th:src="@{/js/scrollToTop.js}"></script>
+    <script th:src="@{/js/toast.js}"></script>
 </head>
 <body>
-<a data-th-href="@{/catalogue/products/create}" th:inline="text">&rAarr; [[#{'product.link.to_create_product'}]]</a>
-<h1>[[#{'product.page.product_list'}]]</h1>
-<form method="GET" data-th-action="@{/catalogue/products/list}">
-    <label>Filter:<input type="text" name="filter" data-th-value="${filter != null ? filter : ''}">
-        <button type="submit">Search</button>
-    </label>
-</form>
-<table>
-    <thead>
-    <tr>
-        <th>#</th>
-        <th th:text="#{'product.name'}"></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr data-th-each="product: ${products}">
-        <td data-th-text="${product.id}"></td>
-        <td>
-            <a data-th-href="@{/catalogue/products/{productId}(productId=${product.id})}"
-               data-th-text="${product.title}"></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+
+<div th:insert="fragments/header.html :: header"></div>
+<div th:replace="~{/fragments/delete_modal :: deleteModal}"></div>
+<div th:replace="~{/fragments/scroll_to_top_btn.html :: scrollToTopBtn}"></div>
+
+<div th:if="${deleteMessage != null}" class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div th:replace="~{/fragments/toast :: toast('Product Deleted', ${deleteMessage})}"></div>
+</div>
+<div th:if="${createMessage != null}" class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div th:replace="~{/fragments/toast :: toast('Product Created', ${createMessage})}"></div>
+</div>
+
+<div class="container">
+
+    <h2 class="mt-4 mb-4">Product Management</h2>
+
+    <form th:action="@{/catalogue/products/list}" method="GET" id="searchForm">
+        <div class="row justify-content-between align-items-center">
+            <div class="col-md-auto mb-3 mb-md-0">
+                <div class="input-group">
+                    <input type="text" name="filter" th:value="${filter != null ? filter : ''}" class="form-control"
+                           placeholder="Search Product by Title"
+                           aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Search</button>
+                </div>
+            </div>
+            <div class="col-md-auto mb-3 mb-md-0">
+                <div class="input-group">
+                    <label class="input-group-text" for="pageSizeSelect">Page Size:</label>
+                    <select class="form-select" id="pageSizeSelect" name="size" onchange="this.form.submit()">
+                        <option value="5" th:selected="${pageSize == 5}">5</option>
+                        <option value="10" th:selected="${pageSize == 10}">10</option>
+                        <option value="20" th:selected="${pageSize == 20}">20</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="container" th:if="${products.isEmpty()}">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 text-center">
+                <h2 class="mb-3">Oops! No products found.</h2>
+                <p class="text-muted">It seems there are no products matching your search criteria.</p>
+                <a href="/catalogue/products/create" class="btn btn-success mt-3">Add New Product</a>
+            </div>
+        </div>
+    </div>
+
+    <table class="table table-striped product-list" th:if="${not products.isEmpty()}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="productTableBody">
+        <tr th:each="product : ${products}">
+            <td>[[${product.id}]]</td>
+            <td>[[${product.title}]]</td>
+            <td>[[${product.details}]]</td>
+            <td>
+                <div class="d-flex justify-content-start gap-1">
+                    <a th:href="@{/catalogue/products/{productId}/edit(productId=${product.id})}"
+                       class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <form th:id="'deleteProductForm_' + ${product.id}" method="POST"
+                          th:action="@{'/catalogue/products/' + ${product.id} + '/delete'}" class="d-inline">
+                        <input type="hidden" th:id="'productTitle_' + ${product.id}" th:value="${product.title}"/>
+                        <button type="button" class="btn btn-danger btn-sm"
+                                th:data-product-id="${product.id}" th:data-product-title="${product.title}"
+                                onclick="confirmDelete(this)">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="container pt-3">
+        <nav aria-label="Page navigation" th:if="${totalPages != null && totalPages > 1}">
+            <ul class="pagination pagination-sm justify-content-center">
+
+                <li class="page-item" th:classappend="${currentPage > 1 ? '' : 'disabled'}">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true"
+                       th:href="@{/catalogue/products/list(page=${currentPage - 1}, size=${pageSize}, filter=${filter})}">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+
+                <li class="page-item" th:if="${currentPage > 6}">
+                    <a class="page-link" href="#"
+                       th:href="@{/catalogue/products/list(page=1, size=${pageSize}, filter=${filter})}">
+                        1
+                    </a>
+                </li>
+
+                <li class="page-item" th:if="${currentPage > 6}">
+                    <span class="page-link">&hellip;</span>
+                </li>
+
+                <th:block
+                        th:each="page : ${#numbers.sequence((currentPage > 6 ? currentPage - 3 : 1), (currentPage < totalPages - 5 ? currentPage + 3 : totalPages))}">
+                    <li class="page-item" th:classappend="${page == currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#"
+                           th:href="@{/catalogue/products/list(page=${page}, size=${pageSize}, filter=${filter})}"
+                           th:text="${page}"></a>
+                    </li>
+                </th:block>
+
+                <li class="page-item" th:if="${currentPage < totalPages - 5}">
+                    <span class="page-link">&hellip;</span>
+                </li>
+
+                <li class="page-item" th:if="${currentPage < totalPages - 5}">
+                    <a class="page-link" href="#"
+                       th:href="@{/catalogue/products/list(page=${totalPages}, size=${pageSize}, filter=${filter})}">
+                        [[${totalPages}]]
+                    </a>
+                </li>
+
+                <li class="page-item" th:classappend="${currentPage < totalPages ? '' : 'disabled'}">
+                    <a class="page-link" href="#" id="nextPage"
+                       th:href="@{/catalogue/products/list(page=${currentPage + 1}, size=${pageSize}, filter=${filter})}">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script>
+    function confirmDelete(button) {
+        var productId = button.getAttribute('data-product-id');
+        var productTitle = button.getAttribute('data-product-title');
+
+        document.getElementById('deleteProductName').textContent = productTitle;
+        document.getElementById('confirmDeleteBtn').setAttribute('data-product-id', productId);
+
+        var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+        var productId = this.getAttribute('data-product-id');
+        document.getElementById('deleteProductForm_' + productId).submit();
+    });
+</script>
 </body>
 </html>

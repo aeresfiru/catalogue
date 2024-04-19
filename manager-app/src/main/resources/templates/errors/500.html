@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>404 Not Found</title>
+    <title>500 Internal Server Error</title>
 
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/error-page.css}" rel="stylesheet">
@@ -12,10 +12,9 @@
 <body>
 
 <div class="container">
-    <div class="error-code">404</div>
-    <h1>Oops! Page Not Found</h1>
-    <p class="error-message">The page you are looking for might have been removed, had its name changed, or is
-        temporarily unavailable.</p>
+    <div class="error-code">500</div>
+    <h1>Oops! Internal Server Error</h1>
+    <p class="error-message">There was a problem with the server, please try again later.</p>
     <a href="/static" class="btn btn-primary">Go Back to Home</a>
 </div>
 
