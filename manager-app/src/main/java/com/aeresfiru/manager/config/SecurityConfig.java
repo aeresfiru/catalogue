@@ -1,5 +1,6 @@
 package com.aeresfiru.manager.config;
 
+import com.aeresfiru.manager.security.DefaultAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,14 +29,20 @@ public class SecurityConfig {
     private static final String ROLE_PREFIX = "ROLE_";
 
     @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new DefaultAccessDeniedHandler();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/errors/403").permitAll()
                         .anyRequest().hasRole("MANAGER"))
                 .oauth2Login(Customizer.withDefaults())
-                .oauth2Client(Customizer.withDefaults());
-
+                .oauth2Client(Customizer.withDefaults())
+                .exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler()));
         return http.build();
     }
 

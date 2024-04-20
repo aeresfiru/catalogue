@@ -1,47 +1,48 @@
 package com.aeresfiru.manager.client;
 
-import com.aeresfiru.manager.client.exception.ClientBadRequestException;
-import com.aeresfiru.manager.client.exception.ClientEntityNotFoundException;
-import com.aeresfiru.manager.client.exception.ClientServerErrorException;
 import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.PageResponse;
 import com.aeresfiru.manager.client.payload.Product;
 import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
-import org.springframework.http.ProblemDetail;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
-
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class RestClientProductClient implements ProductClient {
 
     private static final String baseUri = "/catalogue-api/v1/products";
 
-    private static final ParameterizedTypeReference<List<Product>> PRODUCTS_TYPE_REFERENCE =
+    private static final ParameterizedTypeReference<PageResponse<Product>> PRODUCTS_TYPE_REFERENCE =
             new ParameterizedTypeReference<>() {
             };
 
     private final RestClient restClient;
 
+    private final RequestExecutor requestExecutor;
+
     @Override
-    public List<Product> findAllProducts(String filter) {
-        return executeRequest(() -> this.restClient
+    public PageResponse<Product> findAllProducts(String filter, int page, int size) {
+        return this.requestExecutor.execute(() -> this.restClient
                 .get()
-                .uri(baseUri + "?filter={filter}", filter)
+                .uri(uriBuilder -> uriBuilder
+                        .path(baseUri)
+                        .queryParam("filter", filter)
+                        .queryParam("page", page)
+                        .queryParam("size", size)
+                        .build())
                 .retrieve()
                 .body(PRODUCTS_TYPE_REFERENCE));
     }
 
     @Override
     public Product createProduct(CreateProductRequest request) {
-        return executeRequest(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.restClient
                 .post()
                 .uri(baseUri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +53,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public Product findProduct(Integer productId) {
-        return executeRequest(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.restClient
                 .get()
                 .uri(baseUri + "/{productId}", productId)
                 .retrieve()
@@ -61,7 +62,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public Product updateProduct(UpdateProductRequest request, Integer productId) {
-        return executeRequest(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.restClient
                 .patch()
                 .uri(baseUri + "/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -72,39 +73,10 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public void deleteProduct(Integer productId) {
-        executeRequest(() -> this.restClient
+        this.requestExecutor.execute(() -> this.restClient
                 .delete()
                 .uri(baseUri + "/{productId}", productId)
                 .retrieve()
                 .toBodilessEntity());
-    }
-
-    private <T> T executeRequest(Supplier<T> requestSupplier) {
-        try {
-            return requestSupplier.get();
-        } catch (HttpClientErrorException.NotFound ex) {
-            var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
-            log.error("Request failed, server resource not found, details: {}", ex.getMessage());
-            throw new ClientEntityNotFoundException(problemDetail);
-        } catch (HttpClientErrorException.BadRequest ex) {
-            log.error("Request failed, server return bad request: {}", ex.getMessage());
-            var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
-            throw new ClientBadRequestException(extractErrors(problemDetail));
-        } catch (HttpClientErrorException ex) {
-            log.error("Request failed, server return unhandled exception: {}", ex.getMessage());
-            var problemDetail = ex.getResponseBodyAs(ProblemDetail.class);
-            throw new ClientServerErrorException(problemDetail);
-        }
-    }
-
-    private List<String> extractErrors(ProblemDetail error) {
-        if (error != null && error.getProperties() != null && error.getProperties().containsKey("errors")) {
-            return ((List<?>) error.getProperties().get("errors")).stream()
-                    .filter(String.class::isInstance)
-                    .map(String::valueOf)
-                    .toList();
-        }
-        log.error("Validation error occurred, but no error messages found: {}", error);
-        return Collections.emptyList();
     }
 }

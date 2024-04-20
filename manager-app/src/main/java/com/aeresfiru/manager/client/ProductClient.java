@@ -1,14 +1,13 @@
 package com.aeresfiru.manager.client;
 
 import com.aeresfiru.manager.client.payload.CreateProductRequest;
+import com.aeresfiru.manager.client.payload.PageResponse;
 import com.aeresfiru.manager.client.payload.Product;
 import com.aeresfiru.manager.client.payload.UpdateProductRequest;
 
-import java.util.List;
-
 public interface ProductClient {
 
-    List<Product> findAllProducts(String filter);
+    PageResponse<Product> findAllProducts(String filter, int page, int size);
 
     Product createProduct(CreateProductRequest request);
 

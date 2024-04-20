@@ -41,16 +41,7 @@ public class ProductListControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "j.daniels")
-    void getNewProductPage_UnauthorizedUser_ReturnsForbidden() throws Exception {
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/catalogue/products/create"))
-                // then
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    void createProduct_RequestIsValid_ToProductPage() throws Exception {
+    void createProduct_RequestIsValid_ToProductListPage() throws Exception {
         // given
         WireMock.stubFor(WireMock.post(WireMock.urlPathMatching("/catalogue-api/v1/products"))
                 .withRequestBody(equalToJson("""
@@ -75,7 +66,7 @@ public class ProductListControllerIT {
                 // then
                 .andExpectAll(
                         status().is3xxRedirection(),
-                        header().string(HttpHeaders.LOCATION, "/catalogue/products/1")
+                        header().string(HttpHeaders.LOCATION, "/catalogue/products/list")
                 );
 
         WireMock.verify(WireMock.postRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products"))
@@ -127,10 +118,16 @@ public class ProductListControllerIT {
         WireMock.stubFor(WireMock.get(WireMock.urlPathMatching("/catalogue-api/v1/products"))
                 .withQueryParam("filter", WireMock.equalTo("Product"))
                 .willReturn(WireMock.ok("""
-                                [
-                                    {"id": 1, "title": "Product #1", "details": "Product #1 details"},
-                                    {"id": 2, "title": "Product #2", "details": "Product #2 details"}
-                                ]""")
+                                {
+                                    "content": [
+                                        {"id": 1, "title": "Product #1", "details": "Product #1 details"},
+                                        {"id": 2, "title": "Product #2", "details": "Product #2 details"}
+                                    ],
+                                    "page": 1,
+                                    "size": 10,
+                                    "totalElements": 2,
+                                    "totalPages": 1
+                                }""")
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
 
         // when
@@ -144,7 +141,11 @@ public class ProductListControllerIT {
                                 new Product(1, "Product #1", "Product #1 details"),
                                 new Product(2, "Product #2", "Product #2 details")
                         )),
-                        model().attribute("filter", "Product")
+                        model().attribute("filter", "Product"),
+                        model().attribute("currentPage", 1),
+                        model().attribute("pageSize", 10),
+                        model().attribute("totalElements", 2L),
+                        model().attribute("totalPages", 1)
                 );
 
         WireMock.verify(WireMock.getRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products"))

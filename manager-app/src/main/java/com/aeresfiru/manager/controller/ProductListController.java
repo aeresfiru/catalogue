@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -25,10 +26,11 @@ public class ProductListController {
     }
 
     @PostMapping("/create")
-    public String createProduct(CreateProductRequest request, Model model, HttpServletResponse resp) {
+    public String createProduct(CreateProductRequest request, Model model, HttpServletResponse resp, RedirectAttributes attributes) {
         try {
-            var result = this.productClient.createProduct(request);
-            return "redirect:/catalogue/products/" + result.id();
+            this.productClient.createProduct(request);
+            attributes.addFlashAttribute("createMessage", "The product has been successfully created.");
+            return "redirect:/catalogue/products/list";
         } catch (ClientBadRequestException ex) {
             model.addAttribute("payload", request);
             model.addAttribute("errors", ex.getErrors());
@@ -38,10 +40,17 @@ public class ProductListController {
     }
 
     @GetMapping("/list")
-    public String getProductsList(Model model, @RequestParam(name = "filter", required = false) String filter) {
-        var products = this.productClient.findAllProducts(filter);
-        model.addAttribute("products", products);
-        model.addAttribute("filter", filter);
+    public String getProductsList(@RequestParam(name = "page", defaultValue = "1") int page,
+                                  @RequestParam(name = "size", defaultValue = "10") int size,
+                                  @RequestParam(name = "filter", required = false) String filter,
+                                  Model model) {
+        var productPage = this.productClient.findAllProducts(filter, page, size);
+        model.addAttribute("products", productPage.content())
+                .addAttribute("currentPage", page)
+                .addAttribute("totalPages", productPage.totalPages())
+                .addAttribute("pageSize", size)
+                .addAttribute("totalElements", productPage.totalElements())
+                .addAttribute("filter", filter);
         return "catalogue/products/list";
     }
 }

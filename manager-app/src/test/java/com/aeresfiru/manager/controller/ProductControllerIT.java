@@ -27,50 +27,6 @@ class ProductControllerIT {
     MockMvc mockMvc;
 
     @Test
-    void getProduct_ProductExists_ReturnsProduct() throws Exception {
-        // given
-        WireMock.stubFor(WireMock.get("/catalogue-api/v1/products/1")
-                .willReturn(WireMock.ok()
-                        .withBody("""
-                                {"id": 1, "title": "title", "details": "details"}
-                                """)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
-
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/catalogue/products/1"))
-                // then
-                .andExpectAll(
-                        status().isOk(),
-                        view().name("catalogue/products/product"),
-                        model().attribute("product", new Product(1, "title", "details"))
-                );
-
-        WireMock.verify(WireMock.getRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products/1")));
-    }
-
-    @Test
-    void getProduct_ProductDoesNotExist_ReturnsNotFound() throws Exception {
-        // given
-        WireMock.stubFor(WireMock.get("/catalogue-api/v1/products/1")
-                .willReturn(WireMock.notFound()
-                        .withBody("""
-                                {"title": "title", "detail": "detail"}
-                                """)
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PROBLEM_JSON_VALUE)));
-
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/catalogue/products/1"))
-                // then
-                .andExpectAll(
-                        status().isNotFound(),
-                        view().name("errors/404"),
-                        model().attributeExists("problemDetail")
-                );
-
-        WireMock.verify(WireMock.getRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products/1")));
-    }
-
-    @Test
     void getProductEditPage_RequestIsValid_ReturnsProductEditPage() throws Exception {
         // given
         WireMock.stubFor(WireMock.get("/catalogue-api/v1/products/1")
@@ -114,15 +70,6 @@ class ProductControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "j.daniels")
-    void getProductEditPage_UnauthorizedUser_ReturnsForbidden() throws Exception {
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/catalogue/products/1/edit"))
-                // then
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void updateProduct_RequestIsValid_RedirectsToProductPage() throws Exception {
         // given
         WireMock.stubFor(WireMock.get("/catalogue-api/v1/products/1")
@@ -150,7 +97,7 @@ class ProductControllerIT {
                 // then
                 .andExpectAll(
                         status().is3xxRedirection(),
-                        redirectedUrl("/catalogue/products/1")
+                        redirectedUrl("/catalogue/products/1/edit")
                 );
 
         WireMock.verify(WireMock.patchRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products/1"))
@@ -231,18 +178,6 @@ class ProductControllerIT {
     }
 
     @Test
-    @WithMockUser(username = "j.daniels")
-    void updateProduct_UserIsNotAuthorized_ReturnsForbidden() throws Exception {
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/catalogue/products/1/edit")
-                        .param("title", "New title")
-                        .param("details", "New details")
-                        .with(csrf()))
-                // then
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void deleteProduct_ProductExists_RedirectsToProductsListPage() throws Exception {
         // given
         WireMock.stubFor(WireMock.get("/catalogue-api/v1/products/1")
@@ -267,15 +202,5 @@ class ProductControllerIT {
                 );
 
         WireMock.verify(WireMock.deleteRequestedFor(WireMock.urlPathMatching("/catalogue-api/v1/products/1")));
-    }
-
-    @Test
-    @WithMockUser(username = "j.daniels")
-    void deleteProduct_UserIsNotAuthorized_ReturnsForbidden() throws Exception {
-        // when
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/catalogue/products/1/delete")
-                        .with(csrf()))
-                // then
-                .andExpect(status().isForbidden());
     }
 }

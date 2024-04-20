@@ -15,6 +15,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ui.ConcurrentModel;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import java.util.Collections;
 
@@ -64,19 +65,6 @@ class ProductControllerTest {
     }
 
     @Test
-    void getProduct_ReturnsProductPage() {
-        // given
-
-        // when
-        var result = this.controller.getProduct();
-
-        // then
-        assertThat(result).isEqualTo("catalogue/products/product");
-
-        verifyNoInteractions(this.productClient);
-    }
-
-    @Test
     void getProductEditPage_ReturnsProductEditPage() {
         // given
 
@@ -94,6 +82,7 @@ class ProductControllerTest {
         // given
         var request = new UpdateProductRequest("New title", "New details");
         var model = new ConcurrentModel();
+        var attributes = new RedirectAttributesModelMap();
         var response = new MockHttpServletResponse();
 
         doReturn(new Product(1, "New title", "New details"))
@@ -101,10 +90,10 @@ class ProductControllerTest {
                 .updateProduct(new UpdateProductRequest("New title", "New details"), 1);
 
         // when
-        var result = this.controller.updateProduct(1, request, model, response);
+        var result = this.controller.updateProduct(1, request, model, response, attributes);
 
         // then
-        assertThat(result).isEqualTo("redirect:/catalogue/products/1");
+        assertThat(result).isEqualTo("redirect:/catalogue/products/1/edit");
         verify(this.productClient).updateProduct(request, 1);
         verifyNoMoreInteractions(this.productClient);
     }
@@ -114,6 +103,7 @@ class ProductControllerTest {
         // given
         var request = new UpdateProductRequest("", null);
         var model = new ConcurrentModel();
+        var attributes = new RedirectAttributesModelMap();
         var response = new MockHttpServletResponse();
         var errors = Collections.singletonList("error");
 
@@ -121,7 +111,7 @@ class ProductControllerTest {
                 .when(this.productClient).updateProduct(request, 1);
 
         // when
-        var result = this.controller.updateProduct(1, request, model, response);
+        var result = this.controller.updateProduct(1, request, model, response, attributes);
 
         // then
         assertThat(result).isEqualTo("catalogue/products/edit");
@@ -151,7 +141,8 @@ class ProductControllerTest {
     @Test
     void deleteProduct_RequestIsValid_ReturnsProductListPage() {
         // when
-        var result = this.controller.deleteProduct(1);
+        var model = new RedirectAttributesModelMap();
+        var result = this.controller.deleteProduct(1, model);
 
         assertThat(result).isEqualTo("redirect:/catalogue/products/list");
         verify(this.productClient).deleteProduct(1);

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RequiredArgsConstructor
 @Controller
@@ -23,11 +24,6 @@ public class ProductController {
         return this.productClient.findProduct(productId);
     }
 
-    @GetMapping
-    public String getProduct() {
-        return "catalogue/products/product";
-    }
-
     @GetMapping("/edit")
     public String getProductEditPage() {
         return "catalogue/products/edit";
@@ -35,11 +31,12 @@ public class ProductController {
 
     @PostMapping("/edit")
     public String updateProduct(@PathVariable("productId") int productId, UpdateProductRequest request,
-                                Model model, HttpServletResponse resp) {
+                                Model model, HttpServletResponse resp, RedirectAttributes attributes) {
         try {
             var product = this.productClient.updateProduct(request, productId);
             model.addAttribute("product", product);
-            return "redirect:/catalogue/products/%d".formatted(productId);
+            attributes.addFlashAttribute("updateMessage", "The product has been successfully updated.");
+            return "redirect:/catalogue/products/%d/edit".formatted(productId);
         } catch (ClientBadRequestException ex) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             model.addAttribute("payload", request);
@@ -49,8 +46,10 @@ public class ProductController {
     }
 
     @PostMapping("/delete")
-    public String deleteProduct(@PathVariable("productId") int productId) {
+    public String deleteProduct(@PathVariable("productId") int productId,
+                                RedirectAttributes attributes) {
         this.productClient.deleteProduct(productId);
+        attributes.addFlashAttribute("deleteMessage", "The product has been successfully deleted.");
         return "redirect:/catalogue/products/list";
     }
 }
