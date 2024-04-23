@@ -1,0 +1,176 @@
+= Catalogue REST API
+:toc: right
+
+== Product Retrieving
+
+=== Find All Products
+
+.Request
+- **URI**: `/catalogue-api/v1/products`
+- **Method**: GET
+- **Description**: Retrieves a list of all products available.
+
+include::{snippets}/catalogue/products/find_all/http-request.adoc[]
+
+.Response
+- **Status Code**: 200 OK
+- **Content Type**: application/json
+- **Body**: JSON array containing details of all products.
+- **Example Response**:
+
+include::{snippets}/catalogue/products/find_all/response-body.adoc[]
+
+.Response Fields
+include::{snippets}/catalogue/products/find_all/response-fields.adoc[]
+
+=== Find Product by ID
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: GET
+- **Description**: Retrieves details of a specific product by its ID.
+
+include::{snippets}/catalogue/products/find_by_id/http-request.adoc[]
+
+.Response
+- **Status Code**: 200 OK
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the product.
+
+include::{snippets}/catalogue/products/find_by_id/response-body.adoc[]
+
+.Response Fields
+include::{snippets}/catalogue/products/find_by_id/response-fields.adoc[]
+
+=== Find Product by ID (Not Found)
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: GET
+- **Description**: Retrieves details of a specific product by its ID.
+Returns a 404 Not Found if the product does not exist.
+
+include::{snippets}/catalogue/products/find_by_id_not_exists/http-request.adoc[]
+
+.Response
+- **Status Code**: 404 Not Found
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+== Product Creation
+
+=== Create Product
+
+.Request
+- **URI**: `/catalogue-api/v1/products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Creates a new product.
+
+include::{snippets}/catalogue/products/create/http-request.adoc[]
+
+.Response
+- **Status Code**: 201 Created
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the created product.
+
+include::{snippets}/catalogue/products/create/response-body.adoc[]
+
+=== Create Product (Invalid Request)
+
+.Request
+- **URI**: `/catalogue-api/v1/products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to create a new product with invalid data.
+
+include::{snippets}/catalogue/products/create_invalid_request/http-request.adoc[]
+
+.Response
+- **Status Code**: 400 Bad Request
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the validation errors.
+
+include::{snippets}/catalogue/products/create_invalid_request/response-body.adoc[]
+
+=== Create Product (Unauthorized)
+
+.Request
+- **URI**: `/catalogue-api/v1/products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to create a new product without proper authorization.
+
+include::{snippets}/catalogue/products/create_unauthorized/http-request.adoc[]
+
+.Response
+- **Status Code**: 403 Forbidden
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+== Product Update
+
+=== Update Product
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: PATCH
+- **Content Type**: application/json
+- **Description**: Updates details of an existing product.
+
+include::{snippets}/catalogue/products/update/http-request.adoc[]
+
+.Response
+- **Status Code**: 200 OK
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the updated product.
+
+include::{snippets}/catalogue/products/update/response-body.adoc[]
+
+=== Update Product (Invalid Request)
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: PATCH
+- **Content Type**: application/json
+- **Description**: Attempts to update details of an existing product with invalid data.
+
+include::{snippets}/catalogue/products/update_invalid_request/http-request.adoc[]
+
+.Response
+- **Status Code**: 400 Bad Request
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the validation errors.
+
+include::{snippets}/catalogue/products/update_invalid_request/response-body.adoc[]
+
+=== Update Product (Not Found)
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: PATCH
+- **Content Type**: application/json
+- **Description**: Attempts to update details of a non-existing product.
+
+include::{snippets}/catalogue/products/update_not_found/http-request.adoc[]
+
+.Response
+- **Status Code**: 404 Not Found
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+== Product Deletion
+
+=== Delete Product
+
+.Request
+- **URI**: `/catalogue-api/v1/products/+{id}+`
+- **Method**: DELETE
+- **Description**: Deletes an existing product by its ID.
+
+include::{snippets}/catalogue/products/delete/http-request.adoc[]
+
+.Response
+- **Status Code**: 204 No Content
+- **Content Type**: N/A
+- **Body**: Empty body.

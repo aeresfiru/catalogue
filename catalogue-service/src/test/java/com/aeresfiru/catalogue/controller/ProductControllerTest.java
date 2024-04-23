@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,17 +43,16 @@ class ProductControllerTest {
                 new Product(1, "title #1", "details #1"),
                 new Product(2, "title #2", "details #2"));
         String filter = "title";
-        Pageable pageable = PageRequest.of(0, 10);
 
         doReturn(new ProductResource(1, "title #1", "details #1"))
                 .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 1));
         doReturn(new ProductResource(2, "title #2", "details #2"))
                 .when(this.productResourceAssembler).toResource(argThat(product -> product.getId() == 2));
 
-        doReturn(new PageImpl<>(products)).when(this.productService).findAllProducts(filter, pageable);
+        doReturn(new PageImpl<>(products)).when(this.productService).findAllProducts(filter, PageRequest.of(0, 10));
 
         // when
-        var result = this.productController.findProducts(filter, pageable);
+        var result = this.productController.findProducts(filter, 0, 10);
 
         // then
         assertThat(result.getContent()).isEqualTo(List.of(

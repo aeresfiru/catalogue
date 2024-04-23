@@ -14,6 +14,10 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8082/realms/sc
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
 server:
   port: 8081
 logging:
@@ -22,3 +26,10 @@ logging:
     org:
       springframework:
         security: DEBUG
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: catalogue-service-swagger-ui
+      use-pkce-with-authorization-code-grant: true
+keycloak:
+  uri: http://localhost:8082

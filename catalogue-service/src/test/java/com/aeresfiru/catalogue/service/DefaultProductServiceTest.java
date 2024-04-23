@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -61,11 +62,11 @@ class DefaultProductServiceTest {
     void findAllProducts_WithFilter_ReturnsFilteredProducts() {
         // given
         var products = List.of(new Product(1, "filtered", "details"));
-        var pageable = Pageable.ofSize(10);
+        var pageable = PageRequest.of(1, 10);
         doReturn(new PageImpl<>(products)).when(this.productRepository).findAllByTitleLikeIgnoreCase("%filter%", pageable);
 
         // when
-        var result = this.productService.findAllProducts("filter", pageable);
+        var result = this.productService.findAllProducts("filter", PageRequest.of(1, 10));
 
         // then
         assertThat(result).isNotEmpty()
@@ -81,11 +82,11 @@ class DefaultProductServiceTest {
         var products = List.of(
                 new Product(1, "title#1", "details#1"),
                 new Product(2, "title#2", "details#2"));
-        var pageable = Pageable.ofSize(10);
+        var pageable = PageRequest.of(1, 10);
         doReturn(new PageImpl<>(products)).when(this.productRepository).findAll(pageable);
 
         // when
-        var result = this.productService.findAllProducts(null, pageable);
+        var result = this.productService.findAllProducts(null, PageRequest.of(1, 10));
 
         // then
         assertThat(result).isNotEmpty().containsExactlyInAnyOrder(

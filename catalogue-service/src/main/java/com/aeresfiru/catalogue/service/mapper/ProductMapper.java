@@ -12,21 +12,17 @@ import org.springframework.util.StringUtils;
 public class ProductMapper {
 
     public Product mapToProduct(CreateProductRequest request) {
-        var product = new Product(null, request.title(), request.details());
-        log.info("Create product request: {} mapped to product: {}", request, product);
-        return product;
+        return new Product(null, request.title(), request.details());
     }
 
     public void updateProduct(Product product, UpdateProductRequest request) {
-        log.info("Updating product: {}", product);
         if (StringUtils.hasText(request.title())) {
-            log.debug("New title provided in request: {}", request);
+            log.debug("New title provided in request: {}", request.title());
             product.setTitle(request.title());
         }
         if (StringUtils.hasText(request.details())) {
-            log.debug("New details provided in request: {}", request);
+            log.debug("New details provided in request: {}", request.details());
             product.setDetails(request.details());
         }
-        log.info("Product fields updated: {}", product);
     }
 }

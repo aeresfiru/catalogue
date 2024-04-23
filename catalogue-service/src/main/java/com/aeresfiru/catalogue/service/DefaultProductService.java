@@ -8,6 +8,7 @@ import com.aeresfiru.catalogue.service.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +27,10 @@ public class DefaultProductService implements ProductService {
     @Override
     public Page<Product> findAllProducts(String filter, Pageable pageable) {
         if (StringUtils.hasText(filter)) {
-            log.info("Retrieved filter parameter: {}, fetching all by filter", filter);
+            log.info("Retrieved filter parameter: '{}', fetching all by filter, {}", filter, pageable);
             return this.productRepository.findAllByTitleLikeIgnoreCase("%" + filter + "%", pageable);
         }
-        log.info("No filter parameter provided, fetching all products");
+        log.info("No filter parameter provided, fetching all products: {}", pageable);
         return this.productRepository.findAll(pageable);
     }
 
