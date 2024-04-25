@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import java.io.Serializable;
 
 public record CreateProductReviewRequest(
+
         @NotNull(message = "{feedback.product.reviews.create.productId_is_null}")
         Integer productId,
 

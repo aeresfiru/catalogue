@@ -9,3 +9,12 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8082/realms/sc
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: feedback-service-swagger-ui
+      use-pkce-with-authorization-code-grant: true
+    path: /feedback-api
+    url: /feedback-api.yaml
+keycloak:
+  uri: http://localhost:8082

@@ -10,6 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -63,18 +65,20 @@ class ProductReviewServiceImplTest {
                         "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36"),
                 new ProductReview(UUID.fromString("ddca1b37-6d92-49aa-be1a-ad9e1d7dd3ec"), 3, 5,
                         "review#3", "904c6170-f88b-487c-bd1a-4380a637276e")
-        ))).when(this.productReviewRepository).findAllByProductId(1);
+        ))).when(this.productReviewRepository).findAllByProductId(1, PageRequest.of(0, 10));
+        doReturn(Mono.just(2L)).when(this.productReviewRepository).countByProductId(1);
 
         // when
-        StepVerifier.create(this.service.findAllProductReviews(1))
+        StepVerifier.create(this.service.findAllProductReviews(1, PageRequest.of(0, 10)))
                 // then
-                .expectNext(
+                .expectNext(new PageImpl<>(List.of(
                         new ProductReview(UUID.fromString("2dbcec0b-686a-4a96-be5a-795b4de19872"), 1, 5,
                                 "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
                         new ProductReview(UUID.fromString("b45be946-6e85-43f8-bcc8-c6927f382d36"), 1, 4,
                                 "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36"),
                         new ProductReview(UUID.fromString("ddca1b37-6d92-49aa-be1a-ad9e1d7dd3ec"), 3, 5,
-                                "review#3", "904c6170-f88b-487c-bd1a-4380a637276e")
+                                "review#3", "904c6170-f88b-487c-bd1a-4380a637276e")),
+                        PageRequest.of(0, 10), 3)
                 )
                 .verifyComplete();
     }

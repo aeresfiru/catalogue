@@ -2,6 +2,7 @@ package com.aeresfiru.feedback.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -16,6 +17,9 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/v3/api-docs", "/feedback-api.yaml/**", "/feedback-api",
+                                "webjars/swagger-ui.html", "webjars/swagger-ui/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/feedback-api/v1/product-reviews/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())

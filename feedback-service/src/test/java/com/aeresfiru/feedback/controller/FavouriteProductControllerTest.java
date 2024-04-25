@@ -1,5 +1,7 @@
 package com.aeresfiru.feedback.controller;
 
+import com.aeresfiru.feedback.controller.resource.FavouriteProductResource;
+import com.aeresfiru.feedback.controller.resource.FavouriteProductResourceAssembler;
 import com.aeresfiru.feedback.entity.FavouriteProduct;
 import com.aeresfiru.feedback.service.FavouriteProductService;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
@@ -7,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -28,6 +30,9 @@ public class FavouriteProductControllerTest {
 
     @Mock
     FavouriteProductService favouriteProductService;
+
+    @Spy
+    FavouriteProductResourceAssembler favouriteProductResourceAssembler;
 
     @InjectMocks
     FavouriteProductController controller;
@@ -45,45 +50,20 @@ public class FavouriteProductControllerTest {
                         .build()
         );
 
-        doReturn(Mono.just(new PageImpl<>(List.of(
+        doReturn(Flux.fromIterable(List.of(
                 new FavouriteProduct(UUID.fromString(favouriteProductId_1), 1, userId),
                 new FavouriteProduct(UUID.fromString(favouriteProductId_2), 3, userId)))
-        )).when(this.favouriteProductService).findFavouriteProducts(userId, PageRequest.of(0, 10));
+        ).when(this.favouriteProductService).findFavouriteProducts(userId);
 
         // when
-        StepVerifier.create(this.controller.findFavouriteProducts(0, 10, Mono.just(token)))
+        StepVerifier.create(this.controller.findFavouriteProducts(Mono.just(token)))
                 // then
-                .expectNext(new PageImpl<>(List.of(
-                        new FavouriteProduct(UUID.fromString(favouriteProductId_1), 1, userId),
-                        new FavouriteProduct(UUID.fromString(favouriteProductId_2), 3, userId)))
+                .expectNext(
+                        new FavouriteProductResource(favouriteProductId_1, 1, userId),
+                        new FavouriteProductResource(favouriteProductId_2, 3, userId)
                 ).verifyComplete();
 
-        verify(this.favouriteProductService).findFavouriteProducts(userId, PageRequest.of(0, 10));
-        verifyNoMoreInteractions(this.favouriteProductService);
-    }
-
-    @Test
-    void findFavouriteProductsByProductId_ReturnsFavouriteProduct() {
-        // given
-        String favouriteProductId = "7c2f09af-9678-4744-91fa-77f2386361fd";
-        String userId = "fe5b0b92-6212-4356-9a52-5f438e747b2a";
-        var token = new JwtAuthenticationToken(
-                Jwt.withTokenValue("e30.e30")
-                        .headers(headers -> headers.put("foo", "bar"))
-                        .claim("sub", userId)
-                        .build()
-        );
-
-        doReturn(Mono.just(new FavouriteProduct(UUID.fromString(favouriteProductId), 1, userId)))
-                .when(this.favouriteProductService).findFavouriteProductByProduct(1, userId);
-
-        // when
-        StepVerifier.create(this.controller.findFavouriteProductByProductId(1, Mono.just(token)))
-                // then
-                .expectNext(new FavouriteProduct(UUID.fromString(favouriteProductId), 1, userId))
-                .verifyComplete();
-
-        verify(this.favouriteProductService).findFavouriteProductByProduct(1, userId);
+        verify(this.favouriteProductService).findFavouriteProducts(userId);
         verifyNoMoreInteractions(this.favouriteProductService);
     }
 
@@ -111,7 +91,7 @@ public class FavouriteProductControllerTest {
                 // then
                 .expectNext(ResponseEntity
                         .created(URI.create("http://localhost/feedback-api/v1/favourite-products/" + favouriteProductId))
-                        .body(new FavouriteProduct(UUID.fromString(favouriteProductId), 1, userId))
+                        .body(new FavouriteProductResource(favouriteProductId, 1, userId))
                 )
                 .verifyComplete();
 

@@ -1,0 +1,373 @@
+openapi: 3.0.1
+info:
+  title: Feedback REST API
+  version: "1.0"
+servers:
+  - url: http://localhost:8085
+    description: API documentation for the feedback service
+paths:
+  /feedback-api/v1/favourite-products:
+    get:
+      summary: Retrieve favourite products
+      description: Retrieve a list of favourite products for the authenticated user
+      operationId: retrieveFavouriteProducts
+      security:
+        - keycloak: [ ]
+      responses:
+        '200':
+          description: Successfully retrieved favourite products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavouriteProducts"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Add Product to Favourites
+      description: Add a new product to the favourites list for the authenticated user
+      operationId: addProductToFavourites
+      security:
+        - keycloak: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFavouriteProductRequest"
+            example:
+              productId: 64
+      responses:
+        '201':
+          description: Product added to favourites successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavouriteProduct"
+              example:
+                id: fe5b0b92-6212-4356-9a52-5f438e747b2a
+                productId: 64
+                userId: 7c2f09af-9678-4744-91fa-77f2386361fd
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      summary: Remove Product from Favourites
+      description: Remove a product of the authenticated user from favourites by its product ID
+      operationId: removeProductFromFavourites
+      security:
+        - keycloak: [ ]
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+      responses:
+        '204':
+          description: Product successfully removed from favourites
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /feedback-api/v1/product-reviews:
+    get:
+      summary: Retrieve product reviews by product ID
+      description: Retrieve all product reviews for the specified product ID
+      operationId: retrieveProductReviews
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Successfully retrieved product reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOfProductReviews"
+              example:
+                totalPages: 2
+                totalElements: 15
+                first: true
+                last: false
+                size: 10
+                content:
+                  - id: fe5b0b92-6212-4356-9a52-5f438e747b2a
+                    productId: 64
+                    userId: 7c2f09af-9678-4744-91fa-77f2386361fd
+                    review: "This product is great!"
+                    rating: 5
+                number: 0
+                sort:
+                  empty: true
+                  unsorted: true
+                  sorted: false
+                pageable:
+                  offset: 0
+                  pageNumber: 0
+                  pageSize: 10
+                  paged: true
+                  unpaged: false
+                numberOfElements: 1
+                empty: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a product review
+      description: Create a new product review for the specified product
+      operationId: createProductReview
+      security:
+        - keycloak: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductReviewRequest"
+            example:
+              productId: 64
+              review: "This product is great!"
+              rating: 5
+      responses:
+        '201':
+          description: Product review created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductReview"
+              example:
+                id: fe5b0b92-6212-4356-9a52-5f438e747b2a
+                productId: 64
+                userId: 7c2f09af-9678-4744-91fa-77f2386361fd
+                review: "This product is great!"
+                rating: 5
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    keycloak:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:8082/realms/sc/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8082/realms/sc/protocol/openid-connect/token
+          scopes:
+            openid: ""
+            microprofile-jwt: ""
+  parameters:
+    ProductId:
+      name: productId
+      in: query
+      description: The ID of the product
+      required: true
+      schema:
+        type: integer
+        format: int32
+    Page:
+      name: page
+      in: query
+      description: Page number for pagination
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 0
+    Size:
+      name: size
+      in: query
+      description: Number of items per page
+      required: false
+      schema:
+        type: integer
+        format: int32
+        default: 10
+  responses:
+    Unauthorized:
+      description: User not authenticated
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    BadRequest:
+      description: Invalid data provided
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+  schemas:
+    FavouriteProduct:
+      type: object
+      required:
+        - productId
+      properties:
+        id:
+          type: string
+          example: fe5b0b92-6212-4356-9a52-5f438e747b2a
+        productId:
+          type: integer
+          example: 64
+        userId:
+          type: string
+          example: 7c2f09af-9678-4744-91fa-77f2386361fd
+    FavouriteProducts:
+      type: array
+      items:
+        $ref: "#/components/schemas/FavouriteProduct"
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "http://sc.com/feedback/error"
+        title:
+          type: string
+          example: "Short description"
+        status:
+          type: integer
+          format: int
+          example: 400
+        detail:
+          type: string
+          example: "Detail description"
+        instance:
+          type: string
+          format: uri
+          example: "/feedback-api/v1/path-to-resource"
+        properties:
+          type: object
+          example: { "errors": [ "error description" ] }
+    CreateFavouriteProductRequest:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int
+          example: 64
+    Page:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items: { }
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    ProductReview:
+      type: object
+      required:
+        - productId
+        - userId
+        - review
+        - rating
+      properties:
+        id:
+          type: string
+          example: "fe5b0b92-6212-4356-9a52-5f438e747b2a"
+        productId:
+          type: integer
+          example: 64
+        userId:
+          type: string
+          example: "7c2f09af-9678-4744-91fa-77f2386361fd"
+        review:
+          type: string
+          example: "This product is great!"
+        rating:
+          type: integer
+          example: 5
+    CreateProductReviewRequest:
+      type: object
+      required:
+        - productId
+        - review
+        - rating
+      properties:
+        productId:
+          type: integer
+          format: int
+          example: 64
+        review:
+          type: string
+          example: "This product is great!"
+        rating:
+          type: integer
+          example: 5
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        unsorted:
+          type: boolean
+        sorted:
+          type: boolean
+    PageOfProductReviews:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductReview"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean

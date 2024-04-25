@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -90,21 +89,16 @@ class FavouriteProductServiceImplTest {
                         "2cb58cb6-5524-4c54-bd85-51b6ca5c9913"),
                 new FavouriteProduct(UUID.fromString("b54c372f-499a-471c-9307-6f445c65b35f"), 1,
                         "2cb58cb6-5524-4c54-bd85-51b6ca5c9913")
-        ))).when(this.favouriteProductRepository).findAllByUserId("2cb58cb6-5524-4c54-bd85-51b6ca5c9913", PageRequest.of(0, 10));
-        doReturn(Mono.just(2L)).when(this.favouriteProductRepository).countAllByUserId("2cb58cb6-5524-4c54-bd85-51b6ca5c9913");
+        ))).when(this.favouriteProductRepository).findAllByUserId("2cb58cb6-5524-4c54-bd85-51b6ca5c9913");
 
         // when
-        StepVerifier.create(this.service.findFavouriteProducts("2cb58cb6-5524-4c54-bd85-51b6ca5c9913", PageRequest.of(0, 10)))
+        StepVerifier.create(this.service.findFavouriteProducts("2cb58cb6-5524-4c54-bd85-51b6ca5c9913"))
                 // then
-                .expectNextMatches(page -> {
-                    if (page == null) return false;
-                    page.getContent();
-                    return page.getContent().containsAll(List.of(
-                            new FavouriteProduct(UUID.fromString("7c2f09af-9678-4744-91fa-77f2386361fd"), 1,
-                                    "2cb58cb6-5524-4c54-bd85-51b6ca5c9913"),
-                            new FavouriteProduct(UUID.fromString("b54c372f-499a-471c-9307-6f445c65b35f"), 1,
-                                    "2cb58cb6-5524-4c54-bd85-51b6ca5c9913")));
-                })
+                .expectNext(
+                        new FavouriteProduct(UUID.fromString("7c2f09af-9678-4744-91fa-77f2386361fd"), 1,
+                                "2cb58cb6-5524-4c54-bd85-51b6ca5c9913"),
+                        new FavouriteProduct(UUID.fromString("b54c372f-499a-471c-9307-6f445c65b35f"), 1,
+                                "2cb58cb6-5524-4c54-bd85-51b6ca5c9913"))
                 .verifyComplete();
     }
 }

@@ -3,13 +3,11 @@ package com.aeresfiru.feedback.service;
 import com.aeresfiru.feedback.entity.FavouriteProduct;
 import com.aeresfiru.feedback.repository.FavouriteProductRepository;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
-import com.aeresfiru.feedback.service.dto.RestPage;
 import com.aeresfiru.feedback.service.mapper.FavouriteProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.NoSuchElementException;
@@ -31,12 +29,9 @@ public class FavouriteProductServiceImpl implements FavouriteProductService {
     }
 
     @Override
-    public Mono<Page<FavouriteProduct>> findFavouriteProducts(String userId, Pageable pageable) {
-        return this.repository.findAllByUserId(userId, pageable)
-                .doOnError(ex -> log.error("Failed to retrieve favourite products, user ID: '{}'", userId, ex))
-                .collectList()
-                .zipWith(this.repository.countAllByUserId(userId))
-                .map(p -> new RestPage<>(p.getT1(), pageable.getPageNumber(), pageable.getPageSize(), p.getT2()));
+    public Flux<FavouriteProduct> findFavouriteProducts(String userId) {
+        return this.repository.findAllByUserId(userId)
+                .doOnError(ex -> log.error("Failed to retrieve favourite products, user ID: '{}'", userId, ex));
     }
 
     @Override

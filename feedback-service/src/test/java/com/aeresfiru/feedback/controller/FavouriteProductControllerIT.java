@@ -1,28 +1,35 @@
 package com.aeresfiru.feedback.controller;
 
 import com.aeresfiru.feedback.entity.FavouriteProduct;
-import com.aeresfiru.feedback.service.dto.RestPage;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt;
 
 @Slf4j
 @SpringBootTest
 @AutoConfigureWebTestClient
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 class FavouriteProductControllerIT {
 
     @Autowired
@@ -48,134 +55,139 @@ class FavouriteProductControllerIT {
         this.reactiveMongoTemplate.remove(FavouriteProduct.class).all().block();
     }
 
+    @DisplayName("The endpoint returns favourite products correctly")
     @Test
     void findFavouriteProducts_ReturnsFavouriteProducts() {
-        // when
         this.webTestClient
                 .mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
                 .get().uri("/feedback-api/v1/favourite-products")
                 .exchange()
-                // then
-                .expectAll(
-                        spec -> spec.expectStatus().isOk(),
-                        spec -> spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        spec -> spec.expectBody(RestPage.class)
-                );
+                .expectStatus().isOk()
+                .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .json("""
+                        [
+                            {
+                               "id": "7c2f09af-9678-4744-91fa-77f2386361fd",
+                               "productId": 1,
+                               "userId": "fe5b0b92-6212-4356-9a52-5f438e747b2a"
+                            },
+                            {
+                                "id": "697de5c3-2675-4fd9-a295-34ff2c82675c",
+                                "productId": 3,
+                                "userId": "fe5b0b92-6212-4356-9a52-5f438e747b2a"
+                            }
+                        ]""")
+                .consumeWith(document("feedback/favourite-products/find",
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("[].id").description("Favourite product ID"),
+                                fieldWithPath("[].productId").description("Product ID"),
+                                fieldWithPath("[].userId").description("User ID")
+                        )
+                ));
     }
 
+    @DisplayName("Unauthorized users cannot access the endpoint")
     @Test
     void findFavouriteProducts_UserIsNotAuthenticated_ReturnsUnauthorized() {
-        // when
-        this.webTestClient.get().uri("/feedback-api/v1/favourite-products")
+        this.webTestClient
+                .get().uri("/feedback-api/v1/favourite-products")
                 .exchange()
-                // then
-                .expectStatus().isUnauthorized();
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("feedback/favourite-products/find-unauthorized"))
+                .isEmpty();
     }
 
-    @Test
-    void findFavouriteProductByProductId_ProductInFavourites_ReturnsFavouriteProduct() {
-        // when
-        this.webTestClient.mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
-                .get().uri("/feedback-api/v1/favourite-products/by-product/1")
-                .exchange()
-                // then
-                .expectAll(
-                        spec -> spec.expectStatus().isOk(),
-                        spec -> spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON),
-                        spec -> spec.expectBody()
-                                .jsonPath("$.id").isEqualTo("7c2f09af-9678-4744-91fa-77f2386361fd")
-                                .jsonPath("$.productId").isEqualTo(1)
-                                .jsonPath("$.userId").isEqualTo("fe5b0b92-6212-4356-9a52-5f438e747b2a")
-                );
-    }
-
-    @Test
-    void findFavouriteProductByProductId_ProductNotInFavourites_ReturnsNotFound() {
-        // when
-        this.webTestClient.mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
-                .get().uri("/feedback-api/v1/favourite-products/by-product/2")
-                .exchange()
-                // then
-                .expectAll(
-                        spec -> spec.expectStatus().isNotFound(),
-                        spec -> spec.expectBody(ProblemDetail.class)
-                );
-    }
-
-    @Test
-    void findFavouriteProductByProductId_UserIsNotAuthenticated_ReturnsUnauthorized() {
-        // when
-        this.webTestClient.get().uri("/feedback-api/v1/favourite-products/by-product/3")
-                .exchange()
-                // then
-                .expectStatus().isUnauthorized();
-    }
-
+    @DisplayName("A product can be added to favourites successfully")
     @Test
     void addProductToFavourites_RequestIsValid_ReturnsCreatedFavouriteProduct() {
-        // when
-        this.webTestClient.mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
+        this.webTestClient
+                .mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
                 .post().uri("/feedback-api/v1/favourite-products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\"productId\": 1}")
                 .exchange()
-                // then
-                .expectAll(
-                        spec -> spec.expectStatus().isCreated(),
-                        spec -> spec.expectHeader().exists(HttpHeaders.LOCATION),
-                        spec -> spec.expectBody()
-                                .jsonPath("$.id").exists()
-                                .jsonPath("$.productId").isEqualTo(1)
-                                .jsonPath("$.userId").isEqualTo("fe5b0b92-6212-4356-9a52-5f438e747b2a")
-                );
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.id").exists()
+                .json("""
+                        {
+                            "productId":  1,
+                            "userId": "fe5b0b92-6212-4356-9a52-5f438e747b2a"
+                        }""")
+                .consumeWith(document("feedback/favourite-products/add",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("productId").type("int").description("Product ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("Favourite product ID"),
+                                fieldWithPath("productId").description("Product ID"),
+                                fieldWithPath("userId").description("User ID")
+                        )));
     }
 
+    @DisplayName("An invalid request to add a product to favourites returns a bad request")
     @Test
     void addProductToFavourites_RequestIsInvalid_ReturnsBadRequest() {
-        // when
         this.webTestClient
                 .mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
                 .post().uri("/feedback-api/v1/favourite-products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\"productId\": null}")
                 .exchange()
-                // then
-                .expectAll(
-                        spec -> spec.expectStatus().isBadRequest(),
-                        spec -> spec.expectHeader().doesNotExist(HttpHeaders.LOCATION),
-                        spec -> spec.expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON),
-                        spec -> spec.expectBody(ProblemDetail.class)
-                );
+                .expectStatus().isBadRequest()
+                .expectBody(ProblemDetail.class)
+                .consumeWith(document("feedback/favourite-products/add-invalid-request",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        responseFields(
+                                fieldWithPath("type").description("Error type"),
+                                fieldWithPath("title").description("Error title"),
+                                fieldWithPath("status").description("HTTP status code"),
+                                fieldWithPath("detail").description("Error detail message"),
+                                fieldWithPath("instance").description("URI of the request that caused the error"),
+                                fieldWithPath("errors").description("List of invalid parameters and their errors")
+                        )));
     }
 
+    @DisplayName("Unauthorized users cannot add a product to favourites")
     @Test
     void addFavouriteProduct_UserIsNotAuthenticated_ReturnsUnauthorized() {
-        // when
-        this.webTestClient.post().uri("/feedback-api/v1/favourite-products")
+        this.webTestClient
+                .post().uri("/feedback-api/v1/favourite-products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("{\"productId\": 1}")
                 .exchange()
-                // then
-                .expectStatus().isUnauthorized();
+                .expectStatus().isUnauthorized()
+                .expectBody().consumeWith(document("feedback/favourite-products/add-unauthorized"));
     }
 
+    @DisplayName("A product can be removed from favourites successfully")
     @Test
     void removeProductFromFavourites_ReturnsNoContent() {
-        // when
         this.webTestClient
                 .mutateWith(mockJwt().jwt(builder -> builder.subject("fe5b0b92-6212-4356-9a52-5f438e747b2a")))
-                .delete().uri("/feedback-api/v1/favourite-products/by-product/1")
+                .delete().uri("/feedback-api/v1/favourite-products?productId=1")
                 .exchange()
-                // then
-                .expectStatus().isNoContent();
+                .expectStatus().isNoContent()
+                .expectBody()
+                .consumeWith(document("feedback/favourite-products/remove"))
+                .isEmpty();
     }
 
+    @DisplayName("Unauthorized users cannot remove a product from favourites")
     @Test
     void removeProductFromFavourites_UserIsNotAuthenticated_ReturnsUnauthorized() {
-        // when
-        this.webTestClient.delete().uri("/feedback-api/v1/favourite-products/by-product/1")
+        this.webTestClient
+                .delete().uri("feedback-api/v1/favourite-products?productId=1")
                 .exchange()
-                // then
-                .expectStatus().isUnauthorized();
+                .expectStatus().isUnauthorized()
+                .expectBody()
+                .consumeWith(document("feedback/favourite-products/remove-unauthorized"))
+                .isEmpty();
     }
 }

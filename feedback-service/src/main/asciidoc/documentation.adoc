@@ -1,0 +1,200 @@
+= Feedback REST API
+:toc: right
+
+== Product Reviews
+
+=== Find Product Reviews
+
+.Request
+- **URI**: `/feedback-api/v1/product-reviews?productId=+{productId}+`
+- **Method**: GET
+- **Description**: Retrieves product reviews by product ID.
+
+include::{snippets}/feedback/product-reviews/find/http-request.adoc[]
+
+.Response
+- **Status Code**: 200 OK
+- **Content Type**: application/json
+- **Body**: JSON array containing product reviews.
+- **Example Response**:
+
+include::{snippets}/feedback/product-reviews/find/response-body.adoc[]
+
+.Response Fields
+include::{snippets}/feedback/product-reviews/find/response-fields.adoc[]
+
+=== Create Product Review
+
+.Request
+- **URI**: `/feedback-api/v1/product-reviews`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Creates a new product review.
+
+include::{snippets}/feedback/product-reviews/create/http-request.adoc[]
+
+.Request fields
+include::{snippets}/feedback/product-reviews/create/request-fields.adoc[]
+
+.Response
+- **Status Code**: 201 Created
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the created product review.
+
+include::{snippets}/feedback/product-reviews/create/http-response.adoc[]
+
+.Response fields
+include::{snippets}/feedback/product-reviews/create/response-fields.adoc[]
+
+=== Create Product Review (Invalid Request)
+
+.Request
+- **URI**: `/feedback-api/v1/product-reviews`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to create a new product review with invalid data.
+
+include::{snippets}/feedback/product-reviews/create-invalid-request/http-request.adoc[]
+
+.Response
+- **Status Code**: 400 Bad Request
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the validation errors.
+
+include::{snippets}/feedback/product-reviews/create-invalid-request/http-response.adoc[]
+
+=== Create Product Review (Unauthorized)
+
+.Request
+- **URI**: `/feedback-api/v1/product-reviews`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to create a new product review without proper authorization.
+
+include::{snippets}/feedback/product-reviews/create-unauthorized/http-request.adoc[]
+
+.Response
+- **Status Code**: 403 Forbidden
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+== Favourite Products
+
+=== Find Favourite Products
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products`
+- **Method**: GET
+- **Description**: Retrieves favourite products.
+
+include::{snippets}/feedback/favourite-products/find/http-request.adoc[]
+
+.Response
+- **Status Code**: 200 OK
+- **Content Type**: application/json
+- **Body**: JSON array containing favourite products.
+- **Example Response**:
+
+include::{snippets}/feedback/favourite-products/find/response-body.adoc[]
+
+.Response Fields
+include::{snippets}/feedback/favourite-products/find/response-fields.adoc[]
+
+=== Find Favourite Products (Unauthorized)
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products`
+- **Method**: GET
+- **Description**: Retrieves favourite products.
+Returns a 401 Unauthorized if the user is not authenticated.
+
+include::{snippets}/feedback/favourite-products/find-unauthorized/http-request.adoc[]
+
+.Response
+- **Status Code**: 401 Unauthorized
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+=== Add Product to Favourites
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Adds a product to favourites.
+
+include::{snippets}/feedback/favourite-products/add/http-request.adoc[]
+
+.Request fields
+include::{snippets}/feedback/favourite-products/add/request-fields.adoc[]
+
+.Response
+- **Status Code**: 201 Created
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the created favourite product.
+
+include::{snippets}/feedback/favourite-products/add/http-response.adoc[]
+
+.Response fields
+include::{snippets}/feedback/favourite-products/add/response-fields.adoc[]
+
+=== Add Product to Favourites (Invalid Request)
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to add a product to favourites with invalid data.
+
+include::{snippets}/feedback/favourite-products/add-invalid-request/http-request.adoc[]
+
+.Response
+- **Status Code**: 400 Bad Request
+- **Content Type**: application/json
+- **Body**: JSON object containing details of the validation errors.
+
+include::{snippets}/feedback/favourite-products/add-invalid-request/http-response.adoc[]
+
+=== Add Product to Favourites (Unauthorized)
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products`
+- **Method**: POST
+- **Content Type**: application/json
+- **Description**: Attempts to add a product to favourites without proper authorization.
+
+include::{snippets}/feedback/favourite-products/add-unauthorized/http-request.adoc[]
+
+.Response
+- **Status Code**: 403 Forbidden
+- **Content Type**: application/json
+- **Body**: Empty body.
+
+=== Remove Product from Favourites
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products/?productId=+{productId}+`
+- **Method**: DELETE
+- **Description**: Removes a product from favourites by its product ID.
+
+include::{snippets}/feedback/favourite-products/remove/http-request.adoc[]
+
+.Response
+- **Status Code**: 204 No Content
+- **Content Type**: N/A
+- **Body**: Empty body.
+
+=== Remove Product from Favourites (Unauthorized)
+
+.Request
+- **URI**: `/feedback-api/v1/favourite-products?productId=+{productId}+`
+- **Method**: DELETE
+- **Description**: Removes a product from favourites by its product ID.
+Returns a 401 Unauthorized if the user is not authenticated.
+
+include::{snippets}/feedback/favourite-products/remove-unauthorized/http-request.adoc[]
+
+.Response
+- **Status Code**: 401 Unauthorized
+- **Content Type**: application/json
+- **Body**: Empty body.

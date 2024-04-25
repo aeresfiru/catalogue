@@ -1,5 +1,7 @@
 package com.aeresfiru.feedback.controller;
 
+import com.aeresfiru.feedback.controller.resource.ProductReviewResource;
+import com.aeresfiru.feedback.controller.resource.ProductReviewResourceAssembler;
 import com.aeresfiru.feedback.entity.ProductReview;
 import com.aeresfiru.feedback.service.ProductReviewService;
 import com.aeresfiru.feedback.service.dto.CreateProductReviewRequest;
@@ -7,12 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -28,31 +32,34 @@ public class ProductReviewControllerTest {
     @Mock
     ProductReviewService productReviewService;
 
+    @Spy
+    ProductReviewResourceAssembler productReviewResourceAssembler;
+
     @InjectMocks
     ProductReviewController controller;
 
     @Test
     void findProductReviewsByProductId_ReturnsProductReviews() {
         // given
-        doReturn(Flux.fromIterable(List.of(
+        doReturn(Mono.just(new PageImpl<>(List.of(
                 new ProductReview(UUID.fromString("2dbcec0b-686a-4a96-be5a-795b4de19872"), 1, 5,
                         "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
                 new ProductReview(UUID.fromString("b45be946-6e85-43f8-bcc8-c6927f382d36"), 1, 4,
                         "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36")
-        ))).when(this.productReviewService).findAllProductReviews(1);
+        ), PageRequest.of(0, 10), 2))).when(this.productReviewService).findAllProductReviews(1, PageRequest.of(0, 10));
 
         // when
-        StepVerifier.create(this.controller.findProductReviews(1))
+        StepVerifier.create(this.controller.findProductReviews(1, 0, 10))
                 // then
-                .expectNext(
-                        new ProductReview(UUID.fromString("2dbcec0b-686a-4a96-be5a-795b4de19872"), 1, 5,
+                .expectNext(new PageImpl<>(List.of(
+                        new ProductReviewResource("2dbcec0b-686a-4a96-be5a-795b4de19872", 1, 5,
                                 "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
-                        new ProductReview(UUID.fromString("b45be946-6e85-43f8-bcc8-c6927f382d36"), 1, 4,
-                                "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36")
-                )
+                        new ProductReviewResource("b45be946-6e85-43f8-bcc8-c6927f382d36", 1, 4,
+                                "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36"))
+                        , PageRequest.of(0, 10), 2))
                 .verifyComplete();
 
-        verify(this.productReviewService).findAllProductReviews(1);
+        verify(this.productReviewService).findAllProductReviews(1, PageRequest.of(0, 10));
         verifyNoMoreInteractions(this.productReviewService);
     }
 
@@ -76,7 +83,7 @@ public class ProductReviewControllerTest {
                 // then
                 .expectNext(ResponseEntity
                         .created(URI.create("http://localhost/feedback-api/v1/product-reviews/" + reviewId))
-                        .body(new ProductReview(UUID.fromString(reviewId), 1, 4, "review", userId)))
+                        .body(new ProductReviewResource(reviewId, 1, 4, "review", userId)))
                 .verifyComplete();
 
         verify(this.productReviewService).createProductReview(new CreateProductReviewRequest(1, 4, "review"), userId);

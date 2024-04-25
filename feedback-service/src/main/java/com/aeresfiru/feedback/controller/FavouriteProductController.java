@@ -1,16 +1,16 @@
 package com.aeresfiru.feedback.controller;
 
-import com.aeresfiru.feedback.entity.FavouriteProduct;
+import com.aeresfiru.feedback.controller.resource.FavouriteProductResource;
+import com.aeresfiru.feedback.controller.resource.FavouriteProductResourceAssembler;
 import com.aeresfiru.feedback.service.FavouriteProductService;
 import com.aeresfiru.feedback.service.dto.CreateFavouriteProductRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,48 +19,41 @@ import reactor.core.publisher.Mono;
 public class FavouriteProductController {
 
     private final FavouriteProductService favouriteProductService;
+    private final FavouriteProductResourceAssembler resourceAssembler;
 
     @GetMapping
-    public Mono<Page<FavouriteProduct>> findFavouriteProducts(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
+    public Flux<FavouriteProductResource> findFavouriteProducts(
             Mono<JwtAuthenticationToken> jwtAuthTokenMono) {
-        return jwtAuthTokenMono.map(this::extractUserId)
-                .flatMap(userId -> favouriteProductService.findFavouriteProducts(userId, PageRequest.of(page, size)));
-    }
-
-    @GetMapping("/by-product/{productId}")
-    public Mono<FavouriteProduct> findFavouriteProductByProductId(
-            @PathVariable("productId") int productId,
-            Mono<JwtAuthenticationToken> jwtAuthTokenMono) {
-        return jwtAuthTokenMono.map(this::extractUserId)
-                .flatMap(userId -> favouriteProductService.findFavouriteProductByProduct(productId, userId));
+        return jwtAuthTokenMono.flatMap(this::extractUserId)
+                .flatMapMany(authToken -> favouriteProductService.findFavouriteProducts(authToken)
+                        .map(this.resourceAssembler::toResource));
     }
 
     @PostMapping
-    public Mono<ResponseEntity<FavouriteProduct>> addProductToFavourites(
+    public Mono<ResponseEntity<FavouriteProductResource>> addProductToFavourites(
             @Valid @RequestBody Mono<CreateFavouriteProductRequest> requestMono,
             Mono<JwtAuthenticationToken> jwtAuthTokenMono,
             UriComponentsBuilder builder) {
-        return Mono.zip(jwtAuthTokenMono.map(this::extractUserId), requestMono)
+        return Mono.zip(jwtAuthTokenMono.flatMap(this::extractUserId), requestMono)
                 .flatMap(tuple -> favouriteProductService.addProductToFavourites(tuple.getT2(), tuple.getT1()))
+                .map(this.resourceAssembler::toResource)
                 .map(favouriteProduct -> ResponseEntity.created(builder
                                 .replacePath("/feedback-api/v1/favourite-products/{id}")
-                                .build(favouriteProduct.getId()))
+                                .build(favouriteProduct.id()))
                         .body(favouriteProduct)
                 );
     }
 
-    @DeleteMapping("/by-product/{productId}")
+    @DeleteMapping
     public Mono<ResponseEntity<Void>> removeProductFromFavourites(
-            @PathVariable("productId") int productId,
+            @RequestParam("productId") int productId,
             Mono<JwtAuthenticationToken> jwtAuthTokenMono) {
-        return jwtAuthTokenMono.map(this::extractUserId)
+        return jwtAuthTokenMono.flatMap(this::extractUserId)
                 .flatMap(userId -> favouriteProductService.removeProductFromFavourites(productId, userId))
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
-    private String extractUserId(JwtAuthenticationToken jwtAuthenticationToken) {
-        return jwtAuthenticationToken.getToken().getSubject();
+    private Mono<String> extractUserId(JwtAuthenticationToken jwtAuthenticationToken) {
+        return Mono.just(jwtAuthenticationToken.getToken().getSubject());
     }
 }
