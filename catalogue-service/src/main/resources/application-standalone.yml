@@ -31,5 +31,7 @@ springdoc:
     oauth:
       client-id: catalogue-service-swagger-ui
       use-pkce-with-authorization-code-grant: true
+    path: /catalogue-api
+    url: /catalogue-api.yaml
 keycloak:
   uri: http://localhost:8082

@@ -1,0 +1,292 @@
+openapi: 3.0.1
+info:
+  title: Catalogue REST API
+  version: "1.0"
+servers:
+  - url: http://localhost:8081
+    description: API documentation for the catalogue service
+paths:
+  /catalogue-api/v1/products:
+    get:
+      summary: Retrieve products
+      description: Retrieve a list of products with optional filtering
+      security:
+        - keycloak: [ ]
+      operationId: findProducts
+      parameters:
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        '200':
+          description: Successfully retrieved products
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PageOfProductResources"
+              example:
+                totalPages: 1
+                totalElements: 1
+                first: true
+                last: true
+                size: 10
+                content:
+                  - id: 64
+                    title: RGB Mouse
+                    details: This is the greatest mouse of all time!
+                number: 0
+                sort:
+                  empty: true
+                  unsorted: true
+                  sorted: false
+                pageable:
+                  offset: 0
+                  pageNumber: 0
+                  pageSize: 10
+                  paged: true
+                  unpaged: false
+                numberOfElements: 1
+                empty: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create a product
+      description: Create a new product
+      security:
+        - keycloak: [ ]
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductRequest"
+            example:
+              title: "Product A"
+              details: "Description of Product A"
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResource"
+              example:
+                id: 1
+                title: "Product A"
+                details: "Description of Product A"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /products/{productId}:
+    get:
+      summary: Retrieve a product by ID
+      description: Retrieve product details by its ID
+      security:
+        - keycloak: [ ]
+      operationId: findProductById
+      parameters:
+        - $ref: '#/components/parameters/ProductIdPathParam'
+      responses:
+        '200':
+          description: Successfully retrieved product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResource"
+              example:
+                id: 1
+                title: "Product A"
+                details: "Description of Product A"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      summary: Update a product
+      description: Update an existing product by its ID
+      security:
+        - keycloak: [ ]
+      operationId: updateProduct
+      parameters:
+        - $ref: '#/components/parameters/ProductIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductRequest"
+            example:
+              title: "Updated Product A"
+              details: "Updated description of Product A"
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResource"
+              example:
+                id: 1
+                title: "Updated Product A"
+                details: "Updated description of Product A"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: Delete a product
+      description: Delete an existing product by its ID
+      security:
+        - keycloak: [ ]
+      operationId: deleteProduct
+      parameters:
+        - $ref: '#/components/parameters/ProductIdPathParam'
+      responses:
+        '204':
+          description: Product deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    keycloak:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:8082/realms/sc/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8082/realms/sc/protocol/openid-connect/token
+          scopes:
+            openid: ""
+            microprofile-jwt: ""
+            view_catalogue: ""
+            edit_catalogue: ""
+  parameters:
+    Filter:
+      name: filter
+      in: query
+      description: Product title filter
+      schema:
+        type: string
+    Page:
+      name: page
+      in: query
+      description: Page number for pagination
+      schema:
+        type: integer
+        format: int32
+        default: 0
+    Size:
+      name: size
+      in: query
+      description: Number of items per page
+      schema:
+        type: integer
+        format: int32
+        default: 10
+    ProductIdPathParam:
+      name: productId
+      in: path
+      description: The ID of the product
+      required: true
+      schema:
+        type: integer
+  responses:
+    Unauthorized:
+      description: User not authenticated
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    BadRequest:
+      description: Invalid data provided
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    NotFound:
+      description: Product not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+  schemas:
+    ProductResource:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        details:
+          type: string
+    PageOfProductResources:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        last:
+          type: boolean
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductResource"
+        number:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    CreateProductRequest:
+      type: object
+      required:
+        - title
+        - details
+      properties:
+        title:
+          type: string
+        details:
+          type: string
+    UpdateProductRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        details:
+          type: string
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          example: "http://sc.com/feedback/error"
+        title:
+          type: string
+          example: "Short description"
+        status:
+          type: integer
+          format: int
+          example: 400
+        detail:
+          type: string
+          example: "Detail description"
+        instance:
+          type: string
+          format: uri
+          example: "/feedback-api/v1/path-to-resource"
+        properties:
+          type: object
+          example: { "errors": [ "error description" ] }

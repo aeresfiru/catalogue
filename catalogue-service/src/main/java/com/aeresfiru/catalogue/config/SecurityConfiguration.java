@@ -16,9 +16,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs", "/catalogue-api.yaml/**", "/catalogue-api",
+                                "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/catalogue-api/v1/products/**")
-                        .permitAll()
+                        .hasAuthority("SCOPE_view_catalogue")
                         .requestMatchers(HttpMethod.POST, "/catalogue-api/v1/products")
                         .hasAuthority("SCOPE_edit_catalogue")
                         .requestMatchers(HttpMethod.PUT, "/catalogue-api/v1/products/{productId}")
