@@ -18,6 +18,13 @@ spring:
     web:
       pageable:
         one-indexed-parameters: true
+  boot:
+    admin:
+      client:
+        instance:
+          name: catalogue-service
+          service-host-type: ip
+        url: http://localhost:8086
 server:
   port: 8081
 logging:
@@ -31,7 +38,17 @@ springdoc:
     oauth:
       client-id: catalogue-service-swagger-ui
       use-pkce-with-authorization-code-grant: true
-    path: /catalogue-api
+    path: /swagger-ui-catalogue
     url: /catalogue-api.yaml
 keycloak:
   uri: http://localhost:8082
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'

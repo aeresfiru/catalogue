@@ -16,8 +16,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v3/api-docs", "/catalogue-api.yaml/**", "/catalogue-api",
-                                "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/swagger-ui-catalogue/**", "/catalogue-api.yaml", "/swagger-ui/**",
+                                "/swagger-resources/**", "/v3/api-docs/**")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/catalogue-api/v1/products/**")
                         .hasAuthority("SCOPE_view_catalogue")
                         .requestMatchers(HttpMethod.POST, "/catalogue-api/v1/products")
@@ -28,6 +29,7 @@ public class SecurityConfiguration {
                         .hasAuthority("SCOPE_edit_catalogue")
                         .requestMatchers(HttpMethod.DELETE, "/catalogue-api/v1/products/{productId}")
                         .hasAuthority("SCOPE_edit_catalogue")
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(configurer -> configurer.jwt(Customizer.withDefaults()));
