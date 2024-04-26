@@ -10,13 +10,14 @@ paths:
     get:
       summary: Retrieve products
       description: Retrieve a list of products with optional filtering
+      tags:
+        - products
       security:
         - keycloak: [ ]
       operationId: findProducts
       parameters:
         - $ref: '#/components/parameters/Filter'
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Pageable'
       responses:
         '200':
           description: Successfully retrieved products
@@ -52,6 +53,8 @@ paths:
     post:
       summary: Create a product
       description: Create a new product
+      tags:
+        - products
       security:
         - keycloak: [ ]
       operationId: createProduct
@@ -83,6 +86,8 @@ paths:
     get:
       summary: Retrieve a product by ID
       description: Retrieve product details by its ID
+      tags:
+        - products
       security:
         - keycloak: [ ]
       operationId: findProductById
@@ -106,6 +111,8 @@ paths:
     patch:
       summary: Update a product
       description: Update an existing product by its ID
+      tags:
+        - products
       security:
         - keycloak: [ ]
       operationId: updateProduct
@@ -140,6 +147,8 @@ paths:
     delete:
       summary: Delete a product
       description: Delete an existing product by its ID
+      tags:
+        - products
       security:
         - keycloak: [ ]
       operationId: deleteProduct
@@ -172,22 +181,21 @@ components:
       description: Product title filter
       schema:
         type: string
-    Page:
-      name: page
-      in: query
-      description: Page number for pagination
-      schema:
-        type: integer
-        format: int32
-        default: 0
-    Size:
+    Pageable:
       name: size
       in: query
-      description: Number of items per page
+      description: Pagination parameters
       schema:
-        type: integer
-        format: int32
-        default: 10
+        type: object
+        properties:
+          page:
+            type: integer
+            format: int32
+            default: 1
+          size:
+            type: integer
+            format: int32
+            default: 10
     ProductIdPathParam:
       name: productId
       in: path

@@ -52,7 +52,7 @@ class ProductControllerTest {
         doReturn(new PageImpl<>(products)).when(this.productService).findAllProducts(filter, PageRequest.of(0, 10));
 
         // when
-        var result = this.productController.findProducts(filter, 0, 10);
+        var result = this.productController.findProducts(filter, PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent()).isEqualTo(List.of(
