@@ -10,6 +10,8 @@ paths:
     get:
       summary: Retrieve favourite products
       description: Retrieve a list of favourite products for the authenticated user
+      tags:
+        - Favourite products
       operationId: retrieveFavouriteProducts
       security:
         - keycloak: [ ]
@@ -25,6 +27,8 @@ paths:
     post:
       summary: Add Product to Favourites
       description: Add a new product to the favourites list for the authenticated user
+      tags:
+        - Favourite products
       operationId: addProductToFavourites
       security:
         - keycloak: [ ]
@@ -54,6 +58,8 @@ paths:
     delete:
       summary: Remove Product from Favourites
       description: Remove a product of the authenticated user from favourites by its product ID
+      tags:
+        - Favourite products
       operationId: removeProductFromFavourites
       security:
         - keycloak: [ ]
@@ -68,6 +74,8 @@ paths:
     get:
       summary: Retrieve product reviews by product ID
       description: Retrieve all product reviews for the specified product ID
+      tags:
+        - Product reviews
       operationId: retrieveProductReviews
       parameters:
         - $ref: '#/components/parameters/ProductId'
@@ -110,6 +118,8 @@ paths:
     post:
       summary: Create a product review
       description: Create a new product review for the specified product
+      tags:
+        - Product reviews
       operationId: createProductReview
       security:
         - keycloak: [ ]

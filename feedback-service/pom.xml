@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.aeresfiru</groupId>
         <artifactId>sc</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>feedback-service</artifactId>
@@ -15,6 +15,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
     </properties>
 
     <dependencies>
@@ -77,7 +78,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
-            <version>2.3.0</version>
+            <version>${springdoc-openapi.version}</version>
         </dependency>
     </dependencies>
 
