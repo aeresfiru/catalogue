@@ -1,14 +1,10 @@
 package com.aeresfiru.manager.config;
 
-import com.aeresfiru.manager.client.RequestExecutor;
-import com.aeresfiru.manager.client.RestClientProductClient;
 import com.aeresfiru.manager.security.OauthClientHttpRequestInterceptor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;

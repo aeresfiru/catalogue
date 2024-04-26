@@ -17,14 +17,14 @@
 <body>
 
 <div th:insert="~{fragments/header :: header}"></div>
-<div th:replace="~{/fragments/delete_modal :: deleteModal}"></div>
-<div th:replace="~{/fragments/scroll_to_top_btn :: scrollToTopBtn}"></div>
+<div th:replace="~{fragments/delete_modal :: deleteModal}"></div>
+<div th:replace="~{fragments/scroll_to_top_btn :: scrollToTopBtn}"></div>
 
 <div th:if="${deleteMessage != null}" class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div th:replace="~{/fragments/toast :: toast('Product Deleted', ${deleteMessage})}"></div>
+    <div th:replace="~{fragments/toast :: toast('Product Deleted', ${deleteMessage})}"></div>
 </div>
 <div th:if="${createMessage != null}" class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div th:replace="~{/fragments/toast :: toast('Product Created', ${createMessage})}"></div>
+    <div th:replace="~{fragments/toast :: toast('Product Created', ${createMessage})}"></div>
 </div>
 
 <div class="container">

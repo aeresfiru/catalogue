@@ -33,14 +33,6 @@ public class ProductController {
 
     private final ProductReviewService productReviewService;
 
-    @ModelAttribute
-    public Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
-        return exchange.<Mono<CsrfToken>>getAttribute(CsrfToken.class.getName())
-                .doOnNext(csrfToken -> exchange.getAttributes()
-                        .put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, csrfToken))
-                .doOnError(ex -> log.error("Csrf token not found", ex));
-    }
-
     @ModelAttribute(name = "product", binding = false)
     public Mono<Product> product(@PathVariable(name = "productId") Integer productId) {
         return this.productService.findProduct(productId);
@@ -88,5 +80,12 @@ public class ProductController {
                             response.setStatusCode(HttpStatus.BAD_REQUEST);
                             return Mono.just("customer/products/product");
                         }));
+    }
+
+    @ModelAttribute
+    public Mono<CsrfToken> loadCsrfToken(ServerWebExchange exchange) {
+        return exchange.<Mono<CsrfToken>>getAttribute(CsrfToken.class.getName())
+                .doOnSuccess(token -> exchange.getAttributes()
+                        .put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, token));
     }
 }

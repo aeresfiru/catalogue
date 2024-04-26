@@ -1,5 +1,6 @@
 package com.aeresfiru.customer.service;
 
+import com.aeresfiru.customer.client.ProductClient;
 import com.aeresfiru.customer.client.ProductReviewClient;
 import com.aeresfiru.customer.client.payload.CreateProductReviewRequest;
 import com.aeresfiru.customer.client.payload.ProductReview;
@@ -15,16 +16,19 @@ import reactor.core.publisher.Mono;
 public class DefaultProductReviewService implements ProductReviewService {
 
     private final ProductReviewClient productReviewClient;
+    private final ProductClient productClient;
 
     @Override
     public Flux<ProductReview> findProductReviews(Integer productId) {
-        return this.productReviewClient.findProductReviewsByProductId(productId)
+        return this.productClient.findProduct(productId)
+                .flatMapMany(product -> this.productReviewClient.findProductReviewsByProductId(productId))
                 .doOnError(ex -> log.error("Error retrieving product reviews with ID: {}", productId, ex));
     }
 
     @Override
     public Mono<ProductReview> createProductReview(CreateProductReviewRequest request) {
-        return this.productReviewClient.createProductReview(request)
+        return this.productClient.findProduct(request.productId())
+                .flatMap(product -> this.productReviewClient.createProductReview(request))
                 .doOnError(ex -> log.error("Error creating product review", ex));
     }
 }

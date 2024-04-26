@@ -12,12 +12,11 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
         http
-                .authorizeExchange(exchanges -> exchanges
-                        .anyExchange().authenticated())
+                .authorizeExchange(customizer -> customizer.anyExchange().authenticated())
                 .oauth2Login(Customizer.withDefaults())
-                .oauth2Login(Customizer.withDefaults());
+                .oauth2Client(Customizer.withDefaults());
 
         return http.build();
     }

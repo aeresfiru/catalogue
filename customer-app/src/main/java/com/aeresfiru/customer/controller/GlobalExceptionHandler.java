@@ -10,6 +10,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.Locale;
 
@@ -21,6 +22,7 @@ public class GlobalExceptionHandler {
     private final MessageSource messageSource;
 
     @ExceptionHandler(ClientServerErrorException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleClientServerErrorException(ClientServerErrorException ex, Model model) {
         log.error("Client server exception: {}", ex.getMessage(), ex);
         model.addAttribute("problemDetail", ex.getProblemDetail());
@@ -28,13 +30,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ClientEntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleClientEntityNotFoundException(ClientEntityNotFoundException ex, Model model) {
-        log.error("Resource not found: {}", ex.getMessage(), ex);
         model.addAttribute("problemDetail", ex.getProblemDetail());
         return "errors/404";
     }
 
     @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception ex, Model model, Locale locale) {
         log.error("Unknown exception occurred: {}", ex.getMessage(), ex);
         var error = this.getMessage("customer.errors.500.title", locale);

@@ -1,7 +1,7 @@
 package com.aeresfiru.customer.client;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -13,35 +13,51 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class ClientConfig {
 
-    @Bean
-    @Scope("prototype")
-    public WebClient.Builder scServicesClientBuilder(
-            ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
-        var filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository,
-                authorizedClientRepository);
-        filter.setDefaultClientRegistrationId("keycloak");
-        return WebClient.builder()
-                .filter(filter);
+    @Configuration
+    @ConditionalOnProperty(name = "eureka.client.enabled", havingValue = "false")
+    public static class StandaloneClientConfig {
+
+        @Bean
+        @Scope("prototype")
+        public WebClient.Builder selmagServicesWebClientBuilder(
+                ReactiveClientRegistrationRepository clientRegistrationRepository,
+                ServerOAuth2AuthorizedClientRepository authorizedClientRepository) {
+            ServerOAuth2AuthorizedClientExchangeFilterFunction filter =
+                    new ServerOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrationRepository,
+                            authorizedClientRepository);
+            filter.setDefaultClientRegistrationId("keycloak");
+            return WebClient.builder()
+                    .filter(filter);
+        }
     }
 
     @Bean
-    @Qualifier("productWebClient")
-    public WebClient productWebClient(
-            WebClient.Builder scServicesClientBuilder,
-            @Value("${aeresfiru.services.catalogue.url:http://localhost:8081}") String baseUrl) {
-        return scServicesClientBuilder
-                .baseUrl(baseUrl)
-                .build();
+    public ProductClient webClientProductsClient(
+            @Value("${aeresfiru.services.catalogue.uri:http://localhost:8081}") String catalogueBaseUrl,
+            WebClient.Builder selmagServicesWebClientBuilder
+    ) {
+        return new WebClientProductClient(selmagServicesWebClientBuilder
+                .baseUrl(catalogueBaseUrl)
+                .build());
     }
 
     @Bean
-    @Qualifier("feedbackWebClient")
-    public WebClient feedbackWebClient(
-            WebClient.Builder scServicesClientBuilder,
-            @Value("${aeresfiru.services.feedback.url:http://localhost:8085}") String baseUrl) {
-        return scServicesClientBuilder
-                .baseUrl(baseUrl)
-                .build();
+    public FavouriteProductClient favouriteProductClient(
+            @Value("${aeresfiru.services.feedback.uri:http://localhost:8085}") String feedbackBaseUrl,
+            WebClient.Builder selmagServicesWebClientBuilder
+    ) {
+        return new WebClientFavouriteProductClient(selmagServicesWebClientBuilder
+                .baseUrl(feedbackBaseUrl)
+                .build());
+    }
+
+    @Bean
+    public ProductReviewClient productReviewClient(
+            @Value("${aeresfiru.services.feedback.uri:http://localhost:8085}") String feedbackBaseUrl,
+            WebClient.Builder selmagServicesWebClientBuilder
+    ) {
+        return new WebClientProductReviewClient(selmagServicesWebClientBuilder
+                .baseUrl(feedbackBaseUrl)
+                .build());
     }
 }

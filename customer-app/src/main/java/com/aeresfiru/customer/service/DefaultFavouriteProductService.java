@@ -28,20 +28,23 @@ public class DefaultFavouriteProductService implements FavouriteProductService {
 
     @Override
     public Mono<FavouriteProduct> addProductToFavourites(CreateFavouriteProductRequest request) {
-        return this.favouriteProductClient.addProductToFavourites(request)
+        return this.productClient.findProduct(request.productId())
+                .flatMap(product -> this.favouriteProductClient.addProductToFavourites(request))
                 .doOnError(ex -> log.error("Error adding product to favorites, req: {}", request, ex));
     }
 
     @Override
     public Mono<Boolean> isProductInFavourites(Integer productId) {
-        return this.favouriteProductClient.findFavouriteProductByProductId(productId)
-                .hasElement()
+        return this.favouriteProductClient.findAllFavouriteProducts()
+                .filter(favouriteProduct -> productId.equals(favouriteProduct.productId()))
+                .hasElements()
                 .doOnError(ex -> log.error("Error checking if product is favorite with ID: {}", productId, ex));
     }
 
     @Override
     public Flux<Product> findAllFavouriteProducts(String filter, int page, int pageSize) {
         return this.favouriteProductClient.findAllFavouriteProducts()
+                .doOnNext(favouriteProduct -> log.info("Retrieved favourite product: {}", favouriteProduct))
                 .flatMap(favouriteProduct -> this.productClient.findProduct(favouriteProduct.productId()))
                 .filter(product -> isProductTitleContainsFilter(product, filter))
                 .skip((long) page * pageSize)

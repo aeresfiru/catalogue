@@ -16,10 +16,10 @@ public class DefaultProductService implements ProductService {
     private final ProductClient productClient;
 
     @Override
-    public Mono<PageResponse<Product>> findAllProducts(String filter, Integer page, Integer size) {
-        return this.productClient.findAllProducts(filter, page, size)
+    public Mono<PageResponse<Product>> findAllProducts(String filter, Integer pageNumber, Integer size) {
+        return this.productClient.findAllProducts(filter, pageNumber, size)
                 .doOnError(ex -> log.error("Error retrieving products. Filter : {}, page: {}, size: {}",
-                        filter, page, size, ex));
+                        filter, pageNumber, size, ex));
     }
 
     @Override
