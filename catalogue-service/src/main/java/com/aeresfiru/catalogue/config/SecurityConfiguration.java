@@ -29,10 +29,11 @@ public class SecurityConfiguration {
                         .hasAuthority("SCOPE_edit_catalogue")
                         .requestMatchers(HttpMethod.DELETE, "/catalogue-api/v1/products/{productId}")
                         .hasAuthority("SCOPE_edit_catalogue")
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(configurer -> configurer.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(configurer -> configurer.jwt(Customizer.withDefaults()))
+                .oauth2Client(Customizer.withDefaults());
 
         return http.build();
     }

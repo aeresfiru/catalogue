@@ -1,38 +1,48 @@
+aeresfiru:
+  services:
+    admin:
+      registration-id: keycloak
+server:
+  port: 8081
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/catalogue
     username: catalogue
     password: catalogue
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+  jpa:
+    show-sql: true
   flyway:
     schemas:
       - public
       - catalogue
-  jpa:
-    show-sql: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:8086
+        instance:
+          name: catalogue-service
+          service-host-type: ip
+        enabled: true
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8082/realms/sc
-  data:
-    web:
-      pageable:
-        one-indexed-parameters: true
-  boot:
-    admin:
       client:
-        instance:
-          name: catalogue-service
-          service-host-type: ip
-        url: http://localhost:8086
-server:
-  port: 8081
-logging:
-  level:
-    sql: info
-    org:
-      springframework:
-        security: DEBUG
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+        registration:
+          keycloak:
+            client-id: catalogue-service-metrics-client
+            client-secret: nxrIae4d2k8whceCEQYVgarBbln6ai7C
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
 springdoc:
   swagger-ui:
     oauth:
@@ -40,8 +50,6 @@ springdoc:
       use-pkce-with-authorization-code-grant: true
     path: /swagger-ui-catalogue
     url: /catalogue-api.yaml
-keycloak:
-  uri: http://localhost:8082
 management:
   health:
     livenessstate:
