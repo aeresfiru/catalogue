@@ -11,7 +11,7 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 
 @Configuration
 @EnableWebFluxSecurity
-public class SecurityConfig {
+public class SecurityConfiguration {
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -19,11 +19,13 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/swagger-ui-feedback/**", "/feedback-api.yaml", "/swagger-ui/**",
                                 "/webjars/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
+                        .pathMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
                         .pathMatchers(HttpMethod.GET, "/feedback-api/v1/product-reviews/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-                .oauth2ResourceServer(customizer -> customizer.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(customizer -> customizer.jwt(Customizer.withDefaults()))
+                .oauth2Client(Customizer.withDefaults());
         return http.build();
     }
 }

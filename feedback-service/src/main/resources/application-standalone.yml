@@ -1,6 +1,18 @@
+aeresfiru:
+  services:
+    admin:
+      registration-id: keycloak
 server:
   port: 8085
 spring:
+  boot:
+    admin:
+      client:
+        url: http://localhost:8086
+        instance:
+          service-host-type: ip
+          name: feedback-service
+        enabled: true
   data:
     mongodb:
       uri: mongodb://localhost:27017/feedback
@@ -9,6 +21,17 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8082/realms/sc
+      client:
+        registration:
+          keycloak:
+            client-id: feedback-service-metrics-client
+            client-secret: CXqp1pwx2DZhcafFmLMhg5euY1HfziLV
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
 springdoc:
   swagger-ui:
     oauth:
@@ -18,3 +41,13 @@ springdoc:
     url: /feedback-api.yaml
 keycloak:
   uri: http://localhost:8082
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
