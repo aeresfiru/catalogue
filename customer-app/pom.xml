@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.aeresfiru</groupId>
         <artifactId>sc</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>customer-app</artifactId>
@@ -26,6 +26,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -66,6 +70,11 @@
             <artifactId>wiremock-standalone</artifactId>
             <version>${wiremock-standalone.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>3.2.2</version>
         </dependency>
     </dependencies>
 

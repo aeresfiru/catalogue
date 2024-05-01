@@ -9,6 +9,9 @@ server:
 spring:
   security:
     oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
       client:
         provider:
           keycloak:
@@ -22,3 +25,32 @@ spring:
             scope:
               - openid
               - view_catalogue
+          metrics:
+            provider: keycloak
+            client-id: customer-app-metrics-client
+            client-secret: sSBjtJnkYR2cVRpOdBLPlUuE34ZMCKpy
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          service-host-type: ip
+          name: customer-app
+        url: http://localhost:8086
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+logging:
+  level:
+    de:
+      codecentric: DEBUG
