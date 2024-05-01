@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNoHandlerFoundException(NoResourceFoundException ex, Model model) {
+    public String handleNoHandlerFoundException(NoResourceFoundException ex) {
         log.error("No handler found", ex);
         return "errors/404";
     }

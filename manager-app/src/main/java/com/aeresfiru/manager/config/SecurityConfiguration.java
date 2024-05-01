@@ -1,40 +1,39 @@
 package com.aeresfiru.manager.config;
 
 import com.aeresfiru.manager.security.DefaultAccessDeniedHandler;
+import jakarta.annotation.Priority;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 @RequiredArgsConstructor
 @Configuration
-public class SecurityConfig {
-
-    private static final String GROUPS = "groups";
-    private static final String ROLE_PREFIX = "ROLE_";
+public class SecurityConfiguration {
 
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new DefaultAccessDeniedHandler();
+    @Priority(0)
+    public SecurityFilterChain metricsSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher("/actuator/**")
+                .csrf(CsrfConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
+                        .anyRequest().denyAll())
+                .oauth2ResourceServer(customizer -> customizer.jwt(Customizer.withDefaults()))
+                .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Priority(1)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AccessDeniedHandler accessDeniedHandler) throws Exception {
         http
                 .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
@@ -42,27 +41,7 @@ public class SecurityConfig {
                         .anyRequest().hasRole("MANAGER"))
                 .oauth2Login(Customizer.withDefaults())
                 .oauth2Client(Customizer.withDefaults())
-                .exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler()));
+                .exceptionHandling(configurer -> configurer.accessDeniedHandler(accessDeniedHandler));
         return http.build();
-    }
-
-    @Bean
-    public OAuth2UserService<OidcUserRequest, OidcUser> oAuth2UserService() {
-        var oidcUserService = new OidcUserService();
-        return userRequest -> {
-            var oidcUser = oidcUserService.loadUser(userRequest);
-            var authorities = getGrantedAuthorities(oidcUser);
-            return new DefaultOidcUser(authorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
-        };
-    }
-
-    private static List<GrantedAuthority> getGrantedAuthorities(OidcUser oidcUser) {
-        var claims = Optional.ofNullable(oidcUser.getClaimAsStringList(GROUPS))
-                .orElseGet(LinkedList::new);
-
-        return Stream.concat(oidcUser.getAuthorities().stream(), claims.stream()
-                        .filter(role -> role.startsWith(ROLE_PREFIX))
-                        .map(SimpleGrantedAuthority::new))
-                .toList();
     }
 }

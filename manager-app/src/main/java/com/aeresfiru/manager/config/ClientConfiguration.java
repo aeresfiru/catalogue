@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class ServiceClientConfiguration {
+public class ClientConfiguration {
 
     @Value("${aeresfiru.services.catalogue.uri:http://localhost:8081}")
     private String catalogueBaseUri;
@@ -27,8 +27,9 @@ public class ServiceClientConfiguration {
             ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientRepository authorizedClientRepository
     ) {
-        var authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository,
-                authorizedClientRepository);
+        var authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(
+                clientRegistrationRepository, authorizedClientRepository);
+
         var interceptor = new OauthServiceClientHttpRequestInterceptor(authorizedClientManager);
 
         return RestClient.builder()
@@ -36,7 +37,6 @@ public class ServiceClientConfiguration {
                 .requestInterceptor(interceptor)
                 .build();
     }
-
     @Bean
     @ConditionalOnProperty(name = "spring.boot.admin.client.enabled", havingValue = "true")
     public RegistrationClient registrationClient(
@@ -45,6 +45,7 @@ public class ServiceClientConfiguration {
     ) {
         var authorizedClientManager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
                 clientRegistrationRepository, authorizedClientService);
+
         var interceptor = new OauthMetricsClientHttpRequestInterceptor(authorizedClientManager);
 
         return new BlockingRegistrationClient(new RestTemplateBuilder()
