@@ -1,0 +1,26 @@
+server:
+  port: 8086
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+        registration:
+          keycloak:
+            authorization-grant-type: client_credentials
+            client-id: admin-service
+            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            scope:
+              - metrics
+          login:
+            provider: keycloak
+            client-id: admin-service
+            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            scope:
+              - openid
+              - metrics

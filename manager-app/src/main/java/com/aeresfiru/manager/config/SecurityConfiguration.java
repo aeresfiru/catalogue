@@ -51,14 +51,15 @@ public class SecurityConfig {
         var oidcUserService = new OidcUserService();
         return userRequest -> {
             var oidcUser = oidcUserService.loadUser(userRequest);
-            var claims = Optional.ofNullable(oidcUser.getClaimAsStringList(GROUPS))
-                    .orElseGet(LinkedList::new);
-            var authorities = getGrantedAuthorities(oidcUser, claims);
+            var authorities = getGrantedAuthorities(oidcUser);
             return new DefaultOidcUser(authorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
         };
     }
 
-    private static List<GrantedAuthority> getGrantedAuthorities(OidcUser oidcUser, List<String> claims) {
+    private static List<GrantedAuthority> getGrantedAuthorities(OidcUser oidcUser) {
+        var claims = Optional.ofNullable(oidcUser.getClaimAsStringList(GROUPS))
+                .orElseGet(LinkedList::new);
+
         return Stream.concat(oidcUser.getAuthorities().stream(), claims.stream()
                         .filter(role -> role.startsWith(ROLE_PREFIX))
                         .map(SimpleGrantedAuthority::new))
