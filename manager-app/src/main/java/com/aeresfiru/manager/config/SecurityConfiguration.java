@@ -1,6 +1,5 @@
 package com.aeresfiru.manager.config;
 
-import com.aeresfiru.manager.security.DefaultAccessDeniedHandler;
 import jakarta.annotation.Priority;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

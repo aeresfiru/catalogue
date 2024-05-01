@@ -9,8 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
@@ -21,7 +19,7 @@ public class ClientConfig {
 
     @Bean
     @Scope("prototype")
-    public WebClient.Builder selmagServicesWebClientBuilder(
+    public WebClient.Builder servicesWebClientBuilder(
             ServerOAuth2AuthorizedClientExchangeFilterFunction filterFunction
     ) {
         filterFunction.setDefaultClientRegistrationId("keycloak");
@@ -42,9 +40,9 @@ public class ClientConfig {
     @Bean
     public ProductClient webClientProductsClient(
             @Value("${aeresfiru.services.catalogue.uri:http://localhost:8081}") String catalogueBaseUrl,
-            WebClient.Builder selmagServicesWebClientBuilder
+            WebClient.Builder servicesWebClientBuilder
     ) {
-        return new WebClientProductClient(selmagServicesWebClientBuilder
+        return new WebClientProductClient(servicesWebClientBuilder
                 .baseUrl(catalogueBaseUrl)
                 .build());
     }
@@ -52,9 +50,9 @@ public class ClientConfig {
     @Bean
     public FavouriteProductClient webClientFavouriteProductsClient(
             @Value("${aeresfiru.services.feedback.uri:http://localhost:8084}") String feedbackBaseUrl,
-            WebClient.Builder selmagServicesWebClientBuilder
+            WebClient.Builder servicesWebClientBuilder
     ) {
-        return new WebClientFavouriteProductClient(selmagServicesWebClientBuilder
+        return new WebClientFavouriteProductClient(servicesWebClientBuilder
                 .baseUrl(feedbackBaseUrl)
                 .build());
     }
@@ -62,9 +60,9 @@ public class ClientConfig {
     @Bean
     public ProductReviewClient webClientProductReviewsClient(
             @Value("${aeresfiru.services.feedback.uri:http://localhost:8084}") String feedbackBaseUrl,
-            WebClient.Builder selmagServicesWebClientBuilder
+            WebClient.Builder servicesWebClientBuilder
     ) {
-        return new WebClientProductReviewClient(selmagServicesWebClientBuilder
+        return new WebClientProductReviewClient(servicesWebClientBuilder
                 .baseUrl(feedbackBaseUrl)
                 .build());
     }

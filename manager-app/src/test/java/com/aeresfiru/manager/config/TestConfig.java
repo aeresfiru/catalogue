@@ -2,8 +2,6 @@ package com.aeresfiru.manager.config;
 
 import com.aeresfiru.manager.client.RequestExecutor;
 import com.aeresfiru.manager.client.RestClientProductClient;
-import com.aeresfiru.manager.security.OauthMetricsClientHttpRequestInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
