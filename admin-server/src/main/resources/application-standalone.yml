@@ -1,6 +1,14 @@
 server:
   port: 8086
+eureka:
+  client:
+    enabled: false
 spring:
+  application:
+    name: sc-admin-server
+  cloud:
+    config:
+      enabled: false
   security:
     oauth2:
       resourceserver:
@@ -10,11 +18,13 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
         registration:
           keycloak:
-            authorization-grant-type: client_credentials
+            provider: keycloak
             client-id: admin-service
             client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            authorization-grant-type: client_credentials
             scope:
               - metrics
           login:
@@ -24,3 +34,10 @@ spring:
             scope:
               - openid
               - metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus

@@ -20,8 +20,8 @@ public class SecurityConfiguration {
     public SecurityWebFilterChain metricsSecurityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .securityMatcher(pathMatchers("/actuator/**"))
-                .authorizeExchange(customizer -> customizer.pathMatchers("/actuator/**")
-                        .hasAuthority("SCOPE_metrics"))
+                .authorizeExchange(customizer -> customizer
+                        .pathMatchers("/actuator/**").hasAuthority("SCOPE_metrics"))
                 .oauth2ResourceServer(customizer -> customizer.jwt(Customizer.withDefaults()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
@@ -32,7 +32,8 @@ public class SecurityConfiguration {
     @Priority(1)
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-                .authorizeExchange(customizer -> customizer.anyExchange().authenticated())
+                .authorizeExchange(customizer -> customizer
+                        .anyExchange().authenticated())
                 .oauth2Login(Customizer.withDefaults())
                 .oauth2Client(Customizer.withDefaults())
                 .build();

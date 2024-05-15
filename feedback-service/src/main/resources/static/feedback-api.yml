@@ -305,7 +305,6 @@ components:
       required:
         - productId
         - userId
-        - review
         - rating
       properties:
         id:
@@ -327,7 +326,6 @@ components:
       type: object
       required:
         - productId
-        - review
         - rating
       properties:
         productId:

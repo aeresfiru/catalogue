@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,24 +24,21 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleClientServerErrorException(ClientServerErrorException ex, Model model) {
         log.error("Client server exception: {}", ex.getMessage(), ex);
-        model.addAttribute("problemDetail", ex.getProblemDetail());
+        model.addAttribute("error", ex.getProblemDetail().getDetail());
         return "errors/500";
     }
 
     @ExceptionHandler(ClientEntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleClientEntityNotFoundException(ClientEntityNotFoundException ex, Model model) {
-        model.addAttribute("problemDetail", ex.getProblemDetail());
+        model.addAttribute("error", ex.getProblemDetail().getDetail());
         return "errors/404";
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleException(Exception ex, Model model, Locale locale) {
-        log.error("Unknown exception occurred: {}", ex.getMessage(), ex);
-        var error = this.getMessage("customer.errors.500.title", locale);
-        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, error);
-        model.addAttribute("problemDetail", problemDetail);
+    public String handleException(Exception ex) {
+        log.error("Unexpected exception occurred", ex);
         return "errors/500";
     }
 

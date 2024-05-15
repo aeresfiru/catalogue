@@ -15,18 +15,21 @@ public class ClientConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "spring.boot.admin.client.enabled", havingValue = "true")
-    public RegistrationClient registrationClient(OauthMetricsClientHttpRequestInterceptor clientHttpRequestInterceptor) {
+    public RegistrationClient registrationClient(
+            OauthMetricsClientHttpRequestInterceptor clientHttpRequestInterceptor
+    ) {
         return new BlockingRegistrationClient(new RestTemplateBuilder()
                 .interceptors(clientHttpRequestInterceptor)
                 .build());
     }
 
     @Bean
-    public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceOAuth2AuthorizedClientManager(
+    public OauthMetricsClientHttpRequestInterceptor oauthMetricsClientHttpRequestInterceptor(
             ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientService authorizedClientService
     ) {
-        return new AuthorizedClientServiceOAuth2AuthorizedClientManager(
+        var authorizedClientManager = new AuthorizedClientServiceOAuth2AuthorizedClientManager(
                 clientRegistrationRepository, authorizedClientService);
+        return new OauthMetricsClientHttpRequestInterceptor(authorizedClientManager);
     }
 }

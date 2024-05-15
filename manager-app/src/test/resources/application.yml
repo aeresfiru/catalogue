@@ -2,3 +2,14 @@ aeresfiru:
   services:
     catalogue:
       uri: http://localhost:54321
+spring:
+  boot:
+    admin:
+      client:
+        enabled: false
+  cloud:
+    config:
+      enabled: false
+eureka:
+  client:
+    enabled: false

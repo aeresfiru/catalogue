@@ -1,0 +1,10 @@
+server:
+  port: 8761
+spring:
+  application:
+    name: sc-eureka-server
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      uri: http://config:config@localhost:8888

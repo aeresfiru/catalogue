@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.ui.ConcurrentModel;
 
-import java.util.Locale;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +35,7 @@ class GlobalExceptionHandlerTest {
 
         // then
         assertThat(result).isEqualTo("errors/500");
-        assertThat(model.getAttribute("problemDetail")).isNotNull();
+        assertThat(model.getAttribute("error")).isNotNull();
     }
 
     @Test
@@ -52,21 +50,17 @@ class GlobalExceptionHandlerTest {
 
         // then
         assertThat(result).isEqualTo("errors/404");
-        assertThat(model.getAttribute("problemDetail")).isNotNull();
+        assertThat(model.getAttribute("error")).isNotNull();
     }
 
     @Test
     void handleException_Returns500() {
         // given
-        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, "detail");
-        var ex = new ClientEntityNotFoundException(problemDetail);
-        var model = new ConcurrentModel();
 
         // when
-        var result = this.globalExceptionHandler.handleException(ex, model, Locale.US);
+        var result = this.globalExceptionHandler.handleException(new RuntimeException());
 
         // then
         assertThat(result).isEqualTo("errors/500");
-        assertThat(model.getAttribute("problemDetail")).isNotNull();
     }
 }

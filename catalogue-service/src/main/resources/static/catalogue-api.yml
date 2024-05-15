@@ -80,9 +80,11 @@ paths:
                 details: "Description of Product A"
         '400':
           $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '401':
           $ref: '#/components/responses/Unauthorized'
-  /products/{productId}:
+  /catalogue-api/v1/products/{productId}:
     get:
       summary: Retrieve a product by ID
       description: Retrieve product details by its ID
@@ -142,6 +144,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
     delete:
@@ -159,6 +163,8 @@ paths:
           description: Product deleted successfully
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 components:
@@ -206,6 +212,12 @@ components:
   responses:
     Unauthorized:
       description: User not authenticated
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetail'
+    Forbidden:
+      description: User has no access
       content:
         application/problem+json:
           schema:

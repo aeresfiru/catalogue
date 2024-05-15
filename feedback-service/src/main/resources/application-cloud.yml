@@ -1,0 +1,64 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: sc-feedback-service
+  boot:
+    admin:
+      client:
+        enabled: false
+  cloud:
+    config:
+      enabled: false
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/feedback
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
+        registration:
+          discovery:
+            provider: keycloak
+            client-id: feedback-service
+            client-secret: S9KXq50J2IClBZrKyWZg4KWggBbwcGPM
+            authorization-grant-type: client_credentials
+            scope:
+              - discovery
+          metrics:
+            provider: keycloak
+            client-id: feedback-service-metrics-client
+            client-secret: CXqp1pwx2DZhcafFmLMhg5euY1HfziLV
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: feedback-service-swagger-ui
+      use-pkce-with-authorization-code-grant: true
+    path: /swagger-ui-feedback
+    url: /feedback-api.yaml
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true

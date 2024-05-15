@@ -8,10 +8,8 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
-@Component
 public class OauthHttpHeadersProvider implements HttpHeadersProvider {
 
     private static final String REGISTRATION_ID = "keycloak";
@@ -22,18 +20,22 @@ public class OauthHttpHeadersProvider implements HttpHeadersProvider {
 
     @Override
     public HttpHeaders getHeaders(Instance instance) {
-        OAuth2AuthorizedClient authorizedClient = getAuthorizedClient();
+        OAuth2AuthorizedClient authorizedClient = authorizeClient();
         if (authorizedClient != null && authorizedClient.getAccessToken() != null) {
             return createHeadersWithBearerToken(authorizedClient.getAccessToken());
         }
         return new HttpHeaders();
     }
 
-    private OAuth2AuthorizedClient getAuthorizedClient() {
-        return authorizedClientManager.authorize(
-                OAuth2AuthorizeRequest.withClientRegistrationId(REGISTRATION_ID)
-                        .principal(PRINCIPAL)
-                        .build());
+    private OAuth2AuthorizedClient authorizeClient() {
+        OAuth2AuthorizeRequest request = buildAuthorizeRequest();
+        return authorizedClientManager.authorize(request);
+    }
+
+    private static OAuth2AuthorizeRequest buildAuthorizeRequest() {
+        return OAuth2AuthorizeRequest.withClientRegistrationId(REGISTRATION_ID)
+                .principal(PRINCIPAL)
+                .build();
     }
 
     private HttpHeaders createHeadersWithBearerToken(OAuth2AccessToken accessToken) {

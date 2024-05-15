@@ -1,0 +1,11 @@
+server:
+  forward-headers-strategy: native
+  port: 8081
+spring:
+  application:
+    name: sc-catalogue-service
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      uri: http://config:config@localhost:8888

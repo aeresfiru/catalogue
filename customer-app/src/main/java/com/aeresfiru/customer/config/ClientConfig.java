@@ -6,9 +6,12 @@ import de.codecentric.boot.admin.client.registration.ReactiveRegistrationClient;
 import de.codecentric.boot.admin.client.registration.RegistrationClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.oauth2.client.AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizedClientRepository;
@@ -19,22 +22,17 @@ public class ClientConfig {
 
     @Bean
     @Scope("prototype")
+    @LoadBalanced
     public WebClient.Builder servicesWebClientBuilder(
-            ServerOAuth2AuthorizedClientExchangeFilterFunction filterFunction
-    ) {
-        filterFunction.setDefaultClientRegistrationId("keycloak");
-        return WebClient.builder()
-                .filter(filterFunction);
-    }
-
-    @Bean
-    @Scope("prototype")
-    public ServerOAuth2AuthorizedClientExchangeFilterFunction filterFunction(
             ReactiveClientRegistrationRepository clientRegistrationRepository,
             ServerOAuth2AuthorizedClientRepository authorizedClientRepository
     ) {
-        return new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+        var filterFunction = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
                 clientRegistrationRepository, authorizedClientRepository);
+        filterFunction.setDefaultClientRegistrationId("keycloak");
+
+        return WebClient.builder()
+                .filter(filterFunction);
     }
 
     @Bean
@@ -70,13 +68,18 @@ public class ClientConfig {
     @Bean
     @ConditionalOnProperty(name = "spring.boot.admin.client.enabled", havingValue = "true")
     public RegistrationClient registrationClient(
-            ServerOAuth2AuthorizedClientExchangeFilterFunction filterFunction,
+            ReactiveClientRegistrationRepository clientRegistrationRepository,
+            ReactiveOAuth2AuthorizedClientService authorizedClientService,
             ClientProperties clientProperties
     ) {
-        filterFunction.setDefaultClientRegistrationId("metrics");
+        var authorizedClientManager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+                clientRegistrationRepository, authorizedClientService);
+
+        var filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+        filter.setDefaultClientRegistrationId("metrics");
 
         var webClient = WebClient.builder()
-                .filter(filterFunction)
+                .filter(filter)
                 .build();
 
         return new ReactiveRegistrationClient(webClient, clientProperties.getReadTimeout());

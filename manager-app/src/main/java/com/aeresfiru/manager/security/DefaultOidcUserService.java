@@ -1,5 +1,6 @@
 package com.aeresfiru.manager.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
@@ -21,11 +22,14 @@ public class DefaultOidcUserService extends OidcUserService {
 
     private static final String ROLE_PREFIX = "ROLE_";
 
+    @Value("${spring.security.oauth2.client.provider.keycloak.user-name-attribute:preferred_username}")
+    private String nameAttributeKey;
+
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         var oidcUser = super.loadUser(userRequest);
         var authorities = getGrantedAuthorities(oidcUser);
-        return new DefaultOidcUser(authorities, oidcUser.getIdToken(), oidcUser.getUserInfo());
+        return new DefaultOidcUser(authorities, oidcUser.getIdToken(), oidcUser.getUserInfo(), nameAttributeKey);
     }
 
     private static List<? extends GrantedAuthority> getGrantedAuthorities(OidcUser oidcUser) {

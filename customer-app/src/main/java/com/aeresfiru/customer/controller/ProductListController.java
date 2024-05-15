@@ -25,10 +25,12 @@ public class ProductListController {
     private final FavouriteProductService favouriteProductService;
 
     @GetMapping("list")
-    public Mono<String> showProductsListPage(@RequestParam(name = "filter", required = false) String filter,
-                                             @RequestParam(name = "page", defaultValue = "0") Integer pageNumber,
-                                             @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
-                                             Model model) {
+    public Mono<String> showProductsListPage(
+            @RequestParam(name = "filter", required = false) String filter,
+            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") int pageSize,
+            Model model
+    ) {
         return this.productService.findAllProducts(filter, pageNumber, pageSize)
                 .doOnNext(page -> model.addAttribute("products", page.content())
                         .addAttribute("filter", filter)
@@ -38,10 +40,12 @@ public class ProductListController {
     }
 
     @GetMapping("favourites")
-    public Mono<String> showFavouriteProductsPage(@RequestParam(name = "filter", required = false) String filter,
-                                                  @RequestParam(name = "page", defaultValue = "0") Integer pageNumber,
-                                                  @RequestParam(name = "size", defaultValue = "10") Integer pageSize,
-                                                  Model model) {
+    public Mono<String> showFavouriteProductsPage(
+            @RequestParam(name = "filter", required = false) String filter,
+            @RequestParam(name = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "size", defaultValue = "10") int pageSize,
+            Model model
+    ) {
         return this.favouriteProductService.findAllFavouriteProducts(filter, pageNumber, pageSize)
                 .collectList()
                 .doOnNext(products -> model.addAttribute("products", products)

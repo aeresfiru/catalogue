@@ -1,0 +1,11 @@
+server:
+  port: 8083
+  forward-headers-strategy: native
+spring:
+  application:
+    name: sc-customer-app
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      uri: http://config:config@localhost:8888

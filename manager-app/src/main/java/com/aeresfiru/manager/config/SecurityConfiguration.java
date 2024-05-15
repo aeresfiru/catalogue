@@ -31,8 +31,10 @@ public class SecurityConfiguration {
 
     @Bean
     @Priority(1)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   AccessDeniedHandler accessDeniedHandler) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            AccessDeniedHandler accessDeniedHandler
+    ) throws Exception {
         http
                 .csrf(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize

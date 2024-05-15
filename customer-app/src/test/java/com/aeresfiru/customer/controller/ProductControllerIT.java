@@ -134,7 +134,14 @@ class ProductControllerIT {
     void addProductToFavourites_ProductDoesNotExist_ReturnsNotFoundPage() {
         // given
         stubFor(get("/catalogue-api/v1/products/404")
-                .willReturn(notFound()));
+                .willReturn(notFound()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                        .withBody("""
+                                {
+                                    "title": "Product not found",
+                                    "detail": "Product with the given ID: 404 was not found"
+                                }
+                                """)));
 
         // when
         this.webTestClient
@@ -290,7 +297,14 @@ class ProductControllerIT {
     void createReview_ProductDoesNotExist_ReturnsNotFoundPage() {
         // given
         stubFor(get("/catalogue-api/v1/products/404")
-                .willReturn(notFound()));
+                .willReturn(notFound()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PROBLEM_JSON_VALUE)
+                        .withBody("""
+                                {
+                                    "title": "Product not found",
+                                    "detail": "Product with the given ID: 404 was not found"
+                                }
+                                """)));
 
         // when
         this.webTestClient

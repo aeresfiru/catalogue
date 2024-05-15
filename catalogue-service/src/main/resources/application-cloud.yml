@@ -1,0 +1,77 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: sc-catalogue-service
+  boot:
+    admin:
+      client:
+        enabled: false
+  cloud:
+    config:
+      enabled: false
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/catalogue
+    username: catalogue
+    password: catalogue
+  jpa:
+    show-sql: true
+  flyway:
+    schemas:
+      - public
+      - catalogue
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
+        registration:
+          discovery:
+            provider: keycloak
+            client-id: catalogue-service
+            client-secret: nLxwD6prNeNHLhrCNVVsj66nLQ6ex5I7
+            authorization-grant-type: client_credentials
+            scope:
+              - discovery
+          metrics:
+            provider: keycloak
+            client-id: catalogue-service-metrics-client
+            client-secret: PdgJFgpZHybziuSCuS9ntxo2UfSnQtDr
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: catalogue-service-swagger-ui
+      use-pkce-with-authorization-code-grant: true
+    path: /swagger-ui-catalogue
+    url: /catalogue-api.yaml
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    enabled: true
+    healthcheck:
+      enabled: true

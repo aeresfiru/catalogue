@@ -1,0 +1,61 @@
+aeresfiru:
+  services:
+    catalogue:
+      uri: lb://sc-catalogue-service
+    feedback:
+      uri: lb://sc-feedback-service
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+spring:
+  boot:
+    admin:
+      client:
+        enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: customer-app
+            client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+              - view_catalogue
+          discovery:
+            provider: keycloak
+            client-id: customer-app
+            client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
+            authorization-grant-type: client_credentials
+            scope:
+              - discovery
+          metrics:
+            provider: keycloak
+            client-id: customer-app-metrics-client
+            client-secret: sSBjtJnkYR2cVRpOdBLPlUuE34ZMCKpy
+            authorization-grant-type: client_credentials
+            scope:
+              - metrics_server
+management:
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'

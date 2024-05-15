@@ -1,0 +1,11 @@
+server:
+  forward-headers-strategy: native
+  port: 8084
+spring:
+  application:
+    name: sc-manager-app
+  config:
+    import: 'configserver:'
+  cloud:
+    config:
+      uri: http://config:config@localhost:8888

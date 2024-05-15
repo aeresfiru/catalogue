@@ -12,10 +12,12 @@ import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Component
 public class OauthServiceClientHttpRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final OAuth2AuthorizedClientManager defaultOAuth2AuthorizedClientManager;

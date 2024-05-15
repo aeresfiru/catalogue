@@ -1,32 +1,34 @@
-aeresfiru:
-  services:
-    admin:
-      registration-id: keycloak
 server:
   port: 8081
+eureka:
+  client:
+    enabled: false
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/catalogue
-    username: catalogue
-    password: catalogue
+  boot:
+    admin:
+      client:
+        enabled: true
+        url: http://localhost:8086
+        instance:
+          name: sc-catalogue-service
+          service-host-type: ip
+  cloud:
+    config:
+      enabled: false
   data:
     web:
       pageable:
         one-indexed-parameters: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/catalogue
+    username: catalogue
+    password: catalogue
   jpa:
     show-sql: true
   flyway:
     schemas:
       - public
       - catalogue
-  boot:
-    admin:
-      client:
-        url: http://localhost:8086
-        instance:
-          name: catalogue-service
-          service-host-type: ip
-        enabled: true
   security:
     oauth2:
       resourceserver:
@@ -36,20 +38,22 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:8082/realms/sc
+            user-name-attribute: preferred_username
         registration:
-          keycloak:
+          discovery:
+            provider: keycloak
+            client-id: catalogue-service
+            client-secret: nLxwD6prNeNHLhrCNVVsj66nLQ6ex5I7
+            authorization-grant-type: client_credentials
+            scope:
+              - discovery
+          metrics:
+            provider: keycloak
             client-id: catalogue-service-metrics-client
-            client-secret: nxrIae4d2k8whceCEQYVgarBbln6ai7C
+            client-secret: PdgJFgpZHybziuSCuS9ntxo2UfSnQtDr
             authorization-grant-type: client_credentials
             scope:
               - metrics_server
-springdoc:
-  swagger-ui:
-    oauth:
-      client-id: catalogue-service-swagger-ui
-      use-pkce-with-authorization-code-grant: true
-    path: /swagger-ui-catalogue
-    url: /catalogue-api.yaml
 management:
   health:
     livenessstate:
@@ -60,3 +64,10 @@ management:
     web:
       exposure:
         include: '*'
+springdoc:
+  swagger-ui:
+    oauth:
+      client-id: catalogue-service-swagger-ui
+      use-pkce-with-authorization-code-grant: true
+    path: /swagger-ui-catalogue
+    url: /catalogue-api.yaml

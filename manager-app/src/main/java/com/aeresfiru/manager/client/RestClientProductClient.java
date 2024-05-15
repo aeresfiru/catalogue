@@ -22,13 +22,13 @@ public class RestClientProductClient implements ProductClient {
             new ParameterizedTypeReference<>() {
             };
 
-    private final RestClient restClient;
+    private final RestClient catalogueRestClient;
 
     private final RequestExecutor requestExecutor;
 
     @Override
     public PageResponse<Product> findAllProducts(String filter, int page, int size) {
-        return this.requestExecutor.execute(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.catalogueRestClient
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path(baseUri)
@@ -42,7 +42,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public Product createProduct(CreateProductRequest request) {
-        return this.requestExecutor.execute(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.catalogueRestClient
                 .post()
                 .uri(baseUri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -53,7 +53,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public Product findProduct(Integer productId) {
-        return this.requestExecutor.execute(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.catalogueRestClient
                 .get()
                 .uri(baseUri + "/{productId}", productId)
                 .retrieve()
@@ -62,7 +62,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public Product updateProduct(UpdateProductRequest request, Integer productId) {
-        return this.requestExecutor.execute(() -> this.restClient
+        return this.requestExecutor.execute(() -> this.catalogueRestClient
                 .patch()
                 .uri(baseUri + "/{productId}", productId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -73,7 +73,7 @@ public class RestClientProductClient implements ProductClient {
 
     @Override
     public void deleteProduct(Integer productId) {
-        this.requestExecutor.execute(() -> this.restClient
+        this.requestExecutor.execute(() -> this.catalogueRestClient
                 .delete()
                 .uri(baseUri + "/{productId}", productId)
                 .retrieve()

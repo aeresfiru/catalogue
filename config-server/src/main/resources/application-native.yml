@@ -1,0 +1,16 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: sc-config-server
+  security:
+    user:
+      name: config
+      password: config
+      roles:
+        - CONFIG
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file://${user.home}/Documents/dev/sc/config/cloud/{application}/{profile}

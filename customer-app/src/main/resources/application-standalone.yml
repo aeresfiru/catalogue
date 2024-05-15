@@ -1,12 +1,28 @@
+server:
+  port: 8083
 aeresfiru:
   services:
     catalogue:
-      url: http://localhost:8081
+      uri: http://localhost:8081
     feedback:
-      url: http://localhost:8085
-server:
-  port: 8083
+      uri: http://localhost:8085
+eureka:
+  client:
+    enabled: false
 spring:
+  application:
+    name: sc-customer-application
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          service-host-type: ip
+          name: customer-app
+        url: http://localhost:8086
+  cloud:
+    config:
+      enabled: false
   security:
     oauth2:
       resourceserver:
@@ -19,6 +35,7 @@ spring:
             user-name-attribute: preferred_username
         registration:
           keycloak:
+            provider: keycloak
             client-id: customer-app
             client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
             authorization-grant-type: authorization_code
@@ -32,14 +49,6 @@ spring:
             authorization-grant-type: client_credentials
             scope:
               - metrics_server
-  boot:
-    admin:
-      client:
-        enabled: true
-        instance:
-          service-host-type: ip
-          name: customer-app
-        url: http://localhost:8086
 management:
   health:
     livenessstate:
@@ -50,7 +59,3 @@ management:
     web:
       exposure:
         include: '*'
-logging:
-  level:
-    de:
-      codecentric: DEBUG

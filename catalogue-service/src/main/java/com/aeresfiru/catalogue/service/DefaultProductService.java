@@ -26,10 +26,10 @@ public class DefaultProductService implements ProductService {
     @Override
     public Page<Product> findAllProducts(String filter, Pageable pageable) {
         if (StringUtils.hasText(filter)) {
-            log.info("Retrieved filter parameter: '{}', fetching all by filter, {}", filter, pageable);
+            log.info("Retrieved filter parameter: '{}', fetching all with pagination, {}", filter, pageable);
             return this.productRepository.findAllByTitleLikeIgnoreCase("%" + filter + "%", pageable);
         }
-        log.info("No filter parameter provided, fetching all products: {}", pageable);
+        log.info("No filter parameter provided, fetching all products with pagination: {}", pageable);
         return this.productRepository.findAll(pageable);
     }
 

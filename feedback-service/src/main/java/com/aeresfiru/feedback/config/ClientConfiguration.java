@@ -26,7 +26,7 @@ public class ClientConfiguration {
                 clientRegistrationRepository, authorizedClientService);
 
         var filter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-        filter.setDefaultClientRegistrationId("keycloak");
+        filter.setDefaultClientRegistrationId("metrics");
 
         var webClient = WebClient.builder()
                 .filter(filter)
