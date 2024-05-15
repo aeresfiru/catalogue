@@ -17,7 +17,7 @@ public class SecurityConfiguration {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/swagger-ui-feedback/**", "/feedback-api.yaml", "/swagger-ui/**",
+                        .pathMatchers("/swagger-ui-feedback/**", "/feedback-api.yml", "/swagger-ui/**",
                                 "/webjars/**", "/swagger-resources/**", "/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").hasAuthority("SCOPE_metrics")
                         .pathMatchers(HttpMethod.GET, "/feedback-api/v1/product-reviews/**").permitAll()

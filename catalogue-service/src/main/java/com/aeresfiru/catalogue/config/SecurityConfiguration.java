@@ -16,7 +16,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(CsrfConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui-catalogue/**", "/catalogue-api.yaml", "/swagger-ui/**",
+                        .requestMatchers("/swagger-ui-catalogue/**", "/catalogue-api.yml", "/swagger-ui/**",
                                 "/swagger-resources/**", "/v3/api-docs/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/catalogue-api/v1/products/**")

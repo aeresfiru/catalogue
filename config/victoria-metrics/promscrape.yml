@@ -1,0 +1,15 @@
+scrape_configs:
+  - job_name: sc_admin_service
+    static_configs:
+      - targets: [ "http://localhost:8086" ]
+        labels:
+          application: sc-admin-service
+    metrics_path: /actuator/prometheus
+    oauth2:
+      client_id: victoria-metrics
+      client_secret: 9jsKaG8zeKcyOxUawxUIgZK44oWwSRFQ
+      token_url: http://localhost:8082/realms/sc/protocol/openid-connect/token
+      scopes:
+        - metrics
+      endpoint_params:
+        grant_type: client_credentials

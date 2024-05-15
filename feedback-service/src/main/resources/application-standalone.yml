@@ -42,7 +42,7 @@ springdoc:
       client-id: feedback-service-swagger-ui
       use-pkce-with-authorization-code-grant: true
     path: /swagger-ui-feedback
-    url: /feedback-api.yaml
+    url: /feedback-api.yml
 management:
   health:
     livenessstate:
