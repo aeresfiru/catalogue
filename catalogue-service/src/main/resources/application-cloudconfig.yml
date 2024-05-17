@@ -1,6 +1,6 @@
 server:
-  forward-headers-strategy: native
   port: 8081
+  forward-headers-strategy: framework
 spring:
   application:
     name: sc-catalogue-service

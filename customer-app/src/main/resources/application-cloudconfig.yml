@@ -1,6 +1,6 @@
 server:
   port: 8083
-  forward-headers-strategy: native
+  forward-headers-strategy: framework
 spring:
   application:
     name: sc-customer-app

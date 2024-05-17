@@ -1,0 +1,59 @@
+server:
+  port: 8087
+  forward-headers-strategy: framework
+spring:
+  application:
+    name: sc-api-gateway
+  boot:
+    admin:
+      client:
+        enabled: false
+  cloud:
+    config:
+      enabled: false
+    gateway:
+      routes:
+        - id: catalogue-service-route
+          uri: lb://sc-catalogue-service
+          predicates:
+            - Host=catalogue.sc.com.127.0.0.1.nip.io
+        - id: feedback-service-route
+          uri: lb://sc-feedback-service
+          predicates:
+            - Host=feedback.sc.com.127.0.0.1.nip.io
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/sc
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8082/realms/sc
+        registration:
+          discovery:
+            provider: keycloak
+            client-id: api-gateway
+            client-secret: Nn27BokVP04cg31DFdvsnLpTEb5WfO4W
+            authorization-grant-type: client_credentials
+            scope:
+              - discovery
+management:
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 1
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registryFetchIntervalSeconds: 1

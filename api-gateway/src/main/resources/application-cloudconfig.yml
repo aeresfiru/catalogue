@@ -1,9 +1,9 @@
 server:
-  port: 8086
+  port: 8087
   forward-headers-strategy: framework
 spring:
   application:
-    name: sc-admin-server
+    name: sc-api-gateway
   config:
     import: 'configserver:'
   cloud:

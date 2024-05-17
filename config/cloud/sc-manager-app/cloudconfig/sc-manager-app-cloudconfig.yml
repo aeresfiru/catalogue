@@ -3,12 +3,15 @@ aeresfiru:
     catalogue:
       uri: lb://sc-catalogue-service
 eureka:
+  instance:
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 1
+    hostname: localhost
   client:
     enabled: true
     service-url:
       defaultZone: http://localhost:8761/eureka/
-  instance:
-    prefer-ip-address: true
+    registryFetchIntervalSeconds: 1
 spring:
   boot:
     admin:

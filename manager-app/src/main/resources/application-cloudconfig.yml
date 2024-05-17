@@ -1,6 +1,6 @@
 server:
-  forward-headers-strategy: native
   port: 8084
+  forward-headers-strategy: framework
 spring:
   application:
     name: sc-manager-app

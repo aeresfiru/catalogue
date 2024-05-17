@@ -13,9 +13,17 @@ spring:
     admin:
       client:
         enabled: false
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/feedback
+  cloud:
+    gateway:
+      routes:
+        - id: catalogue-service-route
+          uri: lb://sc-catalogue-service
+          predicates:
+            - Host=catalogue.sc.com.127.0.0.1.nip.io
+        - id: feedback-service-route
+          uri: lb://sc-feedback-service
+          predicates:
+            - Host=feedback.sc.com.127.0.0.1.nip.io
   security:
     oauth2:
       resourceserver:
@@ -25,34 +33,19 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:8082/realms/sc
-            user-name-attribute: preferred_username
         registration:
           discovery:
             provider: keycloak
-            client-id: feedback-service
-            client-secret: S9KXq50J2IClBZrKyWZg4KWggBbwcGPM
+            client-id: api-gateway
+            client-secret: Nn27BokVP04cg31DFdvsnLpTEb5WfO4W
             authorization-grant-type: client_credentials
             scope:
               - discovery
-          metrics:
-            provider: keycloak
-            client-id: feedback-service-metrics-client
-            client-secret: CXqp1pwx2DZhcafFmLMhg5euY1HfziLV
-            authorization-grant-type: client_credentials
-            scope:
-              - metrics_server
-springdoc:
-  swagger-ui:
-    oauth:
-      client-id: feedback-service-swagger-ui
-      use-pkce-with-authorization-code-grant: true
-    path: /swagger-ui-feedback
-    url: /feedback-api.yml
 management:
   health:
-    livenessstate:
+    livenessState:
       enabled: true
-    readinessstate:
+    readinessState:
       enabled: true
   endpoints:
     web:
