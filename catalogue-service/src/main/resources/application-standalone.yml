@@ -44,14 +44,14 @@ spring:
           discovery:
             provider: keycloak
             client-id: catalogue-service
-            client-secret: nLxwD6prNeNHLhrCNVVsj66nLQ6ex5I7
+            client-secret: uFDR2E2jjr7D33GMSBjlUwURH301hwjA
             authorization-grant-type: client_credentials
             scope:
               - discovery
           metrics:
             provider: keycloak
-            client-id: catalogue-service-metrics-client
-            client-secret: PdgJFgpZHybziuSCuS9ntxo2UfSnQtDr
+            client-id: catalogue-service
+            client-secret: uFDR2E2jjr7D33GMSBjlUwURH301hwjA
             authorization-grant-type: client_credentials
             scope:
               - metrics_server

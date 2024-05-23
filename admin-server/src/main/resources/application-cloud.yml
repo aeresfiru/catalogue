@@ -7,7 +7,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
-    register-with-eureka: false
+    enabled: true
+    healthcheck:
+      enabled: true
 spring:
   application:
     name: sc-admin-server
@@ -28,7 +30,7 @@ spring:
           keycloak:
             provider: keycloak
             client-id: admin-service
-            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            client-secret: Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG
             authorization-grant-type: client_credentials
             scope:
               - openid
@@ -37,14 +39,14 @@ spring:
           discovery:
             provider: keycloak
             client-id: admin-service
-            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            client-secret: Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG
             authorization-grant-type: client_credentials
             scope:
               - discovery
           login:
             provider: keycloak
             client-id: admin-service
-            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            client-secret: Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG
             scope:
               - openid
               - metrics

@@ -24,14 +24,14 @@ spring:
           keycloak:
             provider: keycloak
             client-id: admin-service
-            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            client-secret: Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG
             authorization-grant-type: client_credentials
             scope:
               - metrics
           login:
             provider: keycloak
             client-id: admin-service
-            client-secret: 8wDlmDewQ5k48xjAtns6RlcwKu1Nb3LS
+            client-secret: Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG
             scope:
               - openid
               - metrics

@@ -1,0 +1,121 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - './config/keycloak/import:/opt/keycloak/data/import'
+    ports:
+      - "8082:8080"
+    command: start-dev --import-realm
+  feedback-db:
+    image: mongo:7
+    ports:
+      - '27017:27017'
+  catalogue-db:
+    image: postgres:15.2-alpine
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: catalogue
+      POSTGRES_PASSWORD: catalogue
+      POSTGRES_DB: catalogue
+  config-server:
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: config-server/target/config-server-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/config-server:1.0
+    ports:
+      - "8888:8888"
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:///config/{application}/{profile}
+    volumes:
+      - './config/cloud:/config'
+  eureka-server:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: eureka-server/target/eureka-server-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/eureka-server:1.0
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+  admin-server:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: admin-server/target/admin-server-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/admin-server:1.0
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+  catalogue-service:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: catalogue-service/target/catalogue-service-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/catalogue-service:1.0
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+    ports:
+      - "8081:8081"
+  feedback-service:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: feedback-service/target/feedback-service-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/feedback-service:1.0
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+    ports:
+      - "8085:8085"
+  customer-app:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: customer-app/target/customer-app-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/customer-app:1.0
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+    ports:
+      - "8083:8083"
+  manager-app:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: manager-app/target/manager-app-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/manager-app:1.0
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+    ports:
+      - "8084:8084"
+  api-gateway:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      args:
+        JAR_FILE: api-gateway/target/api-gateway-1.0-SNAPSHOT-exec.jar
+      tags:
+        - localhost:5000/sc/api-gateway:1.0
+    environment:
+      SPRING_PROFILES_ACTIVE: cloudconfig
+    ports:
+      - '8087:8087'

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.aeresfiru</groupId>
         <artifactId>sc</artifactId>
-        <version>1.13-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>catalogue-service</artifactId>

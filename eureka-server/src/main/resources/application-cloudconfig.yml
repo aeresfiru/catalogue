@@ -1,11 +1,10 @@
 server:
   port: 8761
-  forward-headers-strategy: framework
 spring:
   application:
     name: sc-eureka-server
   config:
-    import: 'configserver:'
+    import: 'optional:configserver:'
   cloud:
     config:
-      uri: http://config:config@localhost:8888
+      uri: http://config:config-password@config-server:8888

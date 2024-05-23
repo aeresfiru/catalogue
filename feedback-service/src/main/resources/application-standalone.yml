@@ -32,8 +32,8 @@ spring:
         registration:
           metrics:
             provider: keycloak
-            client-id: feedback-service-metrics-client
-            client-secret: CXqp1pwx2DZhcafFmLMhg5euY1HfziLV
+            client-id: feedback-service
+            client-secret: t8qRawo8wTBAE9IqKSnGez699B9STMwj
             authorization-grant-type: client_credentials
             scope:
               - metrics_server

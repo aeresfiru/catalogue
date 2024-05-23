@@ -1,27 +1,29 @@
 eureka:
   instance:
-    hostname: localhost
+    hostname: host.docker.internal
+    leaseRenewalIntervalInSeconds: 1
+    leaseExpirationDurationInSeconds: 1
   client:
-    enabled: true
+    registryFetchIntervalSeconds: 1
     register-with-eureka: false
     fetch-registry: false
     service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: http://host.docker.internal:${server.port}/eureka/
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8082/realms/sc
+          issuer-uri: http://host.docker.internal:8082/realms/sc
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8082/realms/sc
+            issuer-uri: http://host.docker.internal:8082/realms/sc
             user-name-attribute: preferred_username
         registration:
           keycloak:
             client-id: eureka-server
-            client-secret: xHqrnAQjm0eptrHdQwnnX0d4WYevLkFm
+            client-secret: CmiOMjFHzWqXMbde2p2r3Aco6DfE83Oj
             scope:
               - openid
               - microprofile-jwt

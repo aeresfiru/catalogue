@@ -1,12 +1,12 @@
 eureka:
   instance:
+    hostname: host.docker.internal
     leaseRenewalIntervalInSeconds: 1
     leaseExpirationDurationInSeconds: 1
-    hostname: localhost
   client:
     enabled: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://host.docker.internal:8761/eureka/
     registryFetchIntervalSeconds: 1
 spring:
   boot:
@@ -15,29 +15,29 @@ spring:
         enabled: false
   data:
     mongodb:
-      uri: mongodb://localhost:27017/feedback
+      uri: mongodb://host.docker.internal:27017/feedback
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8082/realms/sc
+          issuer-uri: http://host.docker.internal:8082/realms/sc
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8082/realms/sc
+            issuer-uri: http://host.docker.internal:8082/realms/sc
             user-name-attribute: preferred_username
         registration:
           discovery:
             provider: keycloak
             client-id: feedback-service
-            client-secret: S9KXq50J2IClBZrKyWZg4KWggBbwcGPM
+            client-secret: t8qRawo8wTBAE9IqKSnGez699B9STMwj
             authorization-grant-type: client_credentials
             scope:
               - discovery
           metrics:
             provider: keycloak
             client-id: feedback-service-metrics-client
-            client-secret: CXqp1pwx2DZhcafFmLMhg5euY1HfziLV
+            client-secret: t8qRawo8wTBAE9IqKSnGez699B9STMwj
             authorization-grant-type: client_credentials
             scope:
               - metrics_server

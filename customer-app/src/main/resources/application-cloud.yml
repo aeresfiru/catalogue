@@ -37,7 +37,7 @@ spring:
           keycloak:
             provider: keycloak
             client-id: customer-app
-            client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
+            client-secret: Wso5KNTzBfVdRPgtFMigQPV1Q17uSjNO
             authorization-grant-type: authorization_code
             scope:
               - openid
@@ -45,14 +45,14 @@ spring:
           discovery:
             provider: keycloak
             client-id: customer-app
-            client-secret: G1ze2jJUa6ZcAuGKWGfqA73DmRKyAAjA
+            client-secret: Wso5KNTzBfVdRPgtFMigQPV1Q17uSjNO
             authorization-grant-type: client_credentials
             scope:
               - discovery
           metrics:
             provider: keycloak
-            client-id: customer-app-metrics-client
-            client-secret: sSBjtJnkYR2cVRpOdBLPlUuE34ZMCKpy
+            client-id: customer-app
+            client-secret: Wso5KNTzBfVdRPgtFMigQPV1Q17uSjNO
             authorization-grant-type: client_credentials
             scope:
               - metrics_server
