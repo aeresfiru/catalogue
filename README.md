@@ -1,11 +1,17 @@
 # Product Catalogue Project
 
+## Purpose
+
+This project is a pet project aimed at leveling up skills in software development, particularly in building and managing
+microservices using the Spring ecosystem. It serves as a learning experience and a practical application of various
+technologies and best practices.
+
 ## Overview
 
 This project is a product catalogue system designed to allow users to browse products, leave reviews, and manage their
 favorite items. Managers have the ability to add, remove, and update products, as well as manage filter lists. Note that
-purchasing functionality is not implemented in this version. The system is built using a microservices architecture and
-leverages several technologies within the Spring ecosystem.
+purchasing functionality and customer interface is not implemented in this version. The system is built using a
+microservices architecture and leverages several technologies within the Spring ecosystem.
 
 ## Technology Stack
 
@@ -30,19 +36,20 @@ leverages several technologies within the Spring ecosystem.
 - Clone the Repository
 
 ```bash
-  git clone https://github.com/jija-a/catalogue.git
+  git clone git@github.com:jija-a/catalogue.git
   cd catalogue
 ```
 
 ### Running the Services with Docker
 
-- Build the Docker images:
+- Build the project:
 
 ```bash
   ./mvnw clean package
 ```
 
-### Start the services:
+- Launch Docker
+- Build the Docker images and start the services:
 
 ```bash
 docker compose up
