@@ -79,15 +79,13 @@ paths:
       operationId: retrieveProductReviews
       parameters:
         - $ref: '#/components/parameters/ProductId'
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Size'
       responses:
         '200':
           description: Successfully retrieved product reviews
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PageOfProductReviews"
+                $ref: "#/components/schemas/ProductReviewList"
               example:
                 totalPages: 2
                 totalElements: 15
@@ -347,35 +345,7 @@ components:
           type: boolean
         sorted:
           type: boolean
-    PageOfProductReviews:
-      type: object
-      properties:
-        totalPages:
-          type: integer
-          format: int32
-        totalElements:
-          type: integer
-          format: int64
-        first:
-          type: boolean
-        last:
-          type: boolean
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProductReview"
-        number:
-          type: integer
-          format: int32
-        sort:
-          $ref: "#/components/schemas/SortObject"
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
-        numberOfElements:
-          type: integer
-          format: int32
-        empty:
-          type: boolean
+    ProductReviewList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ProductReview"

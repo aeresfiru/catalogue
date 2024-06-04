@@ -20,7 +20,7 @@ import org.springframework.web.client.RestClient;
 import java.util.List;
 
 @Configuration
-@ConditionalOnProperty(value = "eureka.client.enabled", havingValue = "true")
+@ConditionalOnProperty(value = "eureka.client.enabled", havingValue = "true", matchIfMissing = true)
 public class EurekaClientConfiguration {
 
     @Bean

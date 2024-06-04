@@ -11,12 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,25 +40,24 @@ public class ProductReviewControllerTest {
     @Test
     void findProductReviewsByProductId_ReturnsProductReviews() {
         // given
-        doReturn(Mono.just(new PageImpl<>(List.of(
+        doReturn(Flux.fromIterable(List.of(
                 new ProductReview(UUID.fromString("2dbcec0b-686a-4a96-be5a-795b4de19872"), 1, 5,
                         "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
                 new ProductReview(UUID.fromString("b45be946-6e85-43f8-bcc8-c6927f382d36"), 1, 4,
                         "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36")
-        ), PageRequest.of(0, 10), 2))).when(this.productReviewService).findAllProductReviews(1, PageRequest.of(0, 10));
+        ))).when(this.productReviewService).findAllProductReviews(1);
 
         // when
-        StepVerifier.create(this.controller.findProductReviews(1, 0, 10))
+        StepVerifier.create(this.controller.findProductReviews(1))
                 // then
-                .expectNext(new PageImpl<>(List.of(
+                .expectNext(
                         new ProductReviewResource("2dbcec0b-686a-4a96-be5a-795b4de19872", 1, 5,
                                 "review#1", "904c6170-f88b-487c-bd1a-4380a637276e"),
                         new ProductReviewResource("b45be946-6e85-43f8-bcc8-c6927f382d36", 1, 4,
                                 "review#2", "b45be946-6e85-43f8-bcc8-c6927f382d36"))
-                        , PageRequest.of(0, 10), 2))
                 .verifyComplete();
 
-        verify(this.productReviewService).findAllProductReviews(1, PageRequest.of(0, 10));
+        verify(this.productReviewService).findAllProductReviews(1);
         verifyNoMoreInteractions(this.productReviewService);
     }
 

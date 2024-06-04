@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagination</title>
+</head>
+<body>
+
+<div class="container pt-3" th:fragment="pagination(totalPages, currentPage, pageSize, filter)">
+    <nav aria-label="Page navigation" th:if="${totalPages != null && totalPages > 1}">
+        <ul class="pagination pagination-sm justify-content-center">
+
+            <li class="page-item" th:classappend="${currentPage > 1 ? '' : 'disabled'}">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true"
+                   th:href="@{/customer/products/list(page=${currentPage - 1}, size=${pageSize}, filter=${filter})}">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+
+            <li class="page-item" th:if="${currentPage > 6}">
+                <a class="page-link" href="#"
+                   th:href="@{/customer/products/list(page=1, size=${pageSize}, filter=${filter})}">
+                    1
+                </a>
+            </li>
+
+            <li class="page-item" th:if="${currentPage > 6}">
+                <span class="page-link">&hellip;</span>
+            </li>
+
+            <th:block
+                    th:each="page : ${#numbers.sequence((currentPage > 6 ? currentPage - 3 : 1), (currentPage < totalPages - 5 ? currentPage + 3 : totalPages))}">
+                <li class="page-item" th:classappend="${page == currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#"
+                       th:href="@{/customer/products/list(page=${page}, size=${pageSize}, filter=${filter})}"
+                       th:text="${page}"></a>
+                </li>
+            </th:block>
+
+            <li class="page-item" th:if="${currentPage < totalPages - 5}">
+                <span class="page-link">&hellip;</span>
+            </li>
+
+            <li class="page-item" th:if="${currentPage < totalPages - 5}">
+                <a class="page-link" href="#"
+                   th:href="@{/customer/products/list(page=${totalPages}, size=${pageSize}, filter=${filter})}">
+                    [[${totalPages}]]
+                </a>
+            </li>
+
+            <li class="page-item" th:classappend="${currentPage < totalPages ? '' : 'disabled'}">
+                <a class="page-link" href="#" id="nextPage"
+                   th:href="@{/customer/products/list(page=${currentPage + 1}, size=${pageSize}, filter=${filter})}">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

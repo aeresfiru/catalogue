@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container p-5">
+
+    <section class="container mt-5 flex-grow-1">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card p-3 sticky-top">
+
+                    <img src="https://via.placeholder.com/500x300" class="img-fluid mb-3" alt="Product Image">
+                    <h1 class="mb-3">[[${product.title}]]</h1>
+                    <p><strong>Details:</strong> [[${product.details}]]</p>
+
+                    <div class="d-inline-block">
+                        <form method="post" th:if="${isFavourite}"
+                              th:action="@{/customer/products/{productId}/remove-from-favourites(productId=${product.id})}">
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <i class="fas fa-heart-broken"></i> Remove from Favorites
+                            </button>
+                        </form>
+                        <form method="post" th:if="${!isFavourite}"
+                              th:action="@{/customer/products/{productId}/add-to-favourites(productId=${product.id})}">
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-heart"></i> Add to Favorites
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card p-3">
+                    <div class="me-2">
+                        <div class="mt-4 review-form">
+                            <h5>Leave a Review:</h5>
+                            <div th:if="${errors}" th:each="error : ${errors}">
+                                <div class="alert alert-danger" role="alert">
+                                    [[${error}]]
+                                </div>
+                            </div>
+                            <form method="post"
+                                  data-th-action="@{/customer/products/{productId}/create-review(productId=${product.id})}">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div style="margin-right: 10px">Your Rating:</div>
+                                    <div class="rating">
+                                        <input type="radio" id="star5" name="rating" value="5"><label for="star5"><i
+                                            class="fas fa-star"></i></label>
+                                        <input type="radio" id="star4" name="rating" value="4"><label for="star4"><i
+                                            class="fas fa-star"></i></label>
+                                        <input type="radio" id="star3" name="rating" value="3"><label for="star3"><i
+                                            class="fas fa-star"></i></label>
+                                        <input type="radio" id="star2" name="rating" value="2"><label for="star2"><i
+                                            class="fas fa-star"></i></label>
+                                        <input type="radio" id="star1" name="rating" value="1"><label for="star1"><i
+                                            class="fas fa-star"></i></label>
+                                    </div>
+                                </div>
+                                <textarea name="review" class="form-control mb-3" rows="3"
+                                          placeholder="Write your review here..."></textarea>
+                                <button type="submit" class="btn btn-warning">Submit Review</button>
+                            </form>
+                        </div>
+                        <div th:each="review : ${reviews}" class="pt-3">
+                            <div th:replace="~{fragments/review_card :: review(${review.rating}, ${review.review})}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/scroll_to_top_btn :: scrollToTopBtn}"></div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scrollToTop.js}"></script>
+</body>
+</html>

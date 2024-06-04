@@ -71,8 +71,7 @@ class ProductReviewControllerIT {
                 .expectHeader().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .json("""
-                        {
-                            "content": [
+                        [
                                 {
                                     "id": "2dbcec0b-686a-4a96-be5a-795b4de19872",
                                     "productId": 1,
@@ -87,17 +86,15 @@ class ProductReviewControllerIT {
                                     "review": "Kinda like it",
                                     "userId": "b45be946-6e85-43f8-bcc8-c6927f382d36"
                                 }
-                            ]
-                        }""")
+                            ]""")
                 .consumeWith(document("feedback/product-reviews/find",
                         preprocessResponse(prettyPrint()),
                         relaxedResponseFields(
-                                fieldWithPath("content[]").description("List of product reviews"),
-                                fieldWithPath("content[].id").description("Review ID"),
-                                fieldWithPath("content[].productId").description("Product ID"),
-                                fieldWithPath("content[].rating").description("Rating"),
-                                fieldWithPath("content[].review").description("Review content"),
-                                fieldWithPath("content[].userId").description("User ID")
+                                fieldWithPath("[].id").description("Review ID"),
+                                fieldWithPath("[].productId").description("Product ID"),
+                                fieldWithPath("[].rating").description("Rating"),
+                                fieldWithPath("[].review").description("Review content"),
+                                fieldWithPath("[].userId").description("User ID")
                         )
                 ));
     }

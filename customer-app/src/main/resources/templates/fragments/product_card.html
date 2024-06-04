@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<div class="col-md-12 col-lg-4 mb-4 mb-lg-0 mt-3" th:fragment="productCard(id, title, details)">
+    <a th:href="@{/customer/products/{productId}(productId=${id})}" class="product-link">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${title}"></h5>
+                <p class="card-text"
+                   th:text="${#strings.length(details) > 100 ? #strings.substring(details, 0, 100) + '...' : details}"></p>
+            </div>
+        </div>
+    </a>
+</div>
+
+</body>
+</html>

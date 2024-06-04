@@ -20,19 +20,41 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class ClientConfig {
 
-    @Bean
-    @Scope("prototype")
-    @LoadBalanced
-    public WebClient.Builder servicesWebClientBuilder(
-            ReactiveClientRegistrationRepository clientRegistrationRepository,
-            ServerOAuth2AuthorizedClientRepository authorizedClientRepository
-    ) {
-        var filterFunction = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
-                clientRegistrationRepository, authorizedClientRepository);
-        filterFunction.setDefaultClientRegistrationId("keycloak");
+    @Configuration
+    @ConditionalOnProperty(name = "eureka.client.enabled", havingValue = "false")
+    public static class StandaloneClientConfig {
+        @Bean
+        @Scope("prototype")
+        public WebClient.Builder servicesWebClientBuilder(
+                ReactiveClientRegistrationRepository clientRegistrationRepository,
+                ServerOAuth2AuthorizedClientRepository authorizedClientRepository
+        ) {
+            var filterFunction = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+                    clientRegistrationRepository, authorizedClientRepository);
+            filterFunction.setDefaultClientRegistrationId("keycloak");
 
-        return WebClient.builder()
-                .filter(filterFunction);
+            return WebClient.builder()
+                    .filter(filterFunction);
+        }
+    }
+
+    @Configuration
+    @ConditionalOnProperty(name = "eureka.client.enabled", havingValue = "true", matchIfMissing = true)
+    public static class CloudClientConfig {
+        @Bean
+        @Scope("prototype")
+        @LoadBalanced
+        public WebClient.Builder servicesWebClientBuilder(
+                ReactiveClientRegistrationRepository clientRegistrationRepository,
+                ServerOAuth2AuthorizedClientRepository authorizedClientRepository
+        ) {
+            var filterFunction = new ServerOAuth2AuthorizedClientExchangeFilterFunction(
+                    clientRegistrationRepository, authorizedClientRepository);
+            filterFunction.setDefaultClientRegistrationId("keycloak");
+
+            return WebClient.builder()
+                    .filter(filterFunction);
+        }
     }
 
     @Bean

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="review" th:fragment="review(rating, review)">
+    <div class="d-flex justify-content-start review-stars">
+        <div th:each="i : ${#numbers.sequence(1, 5)}" style="margin-right: 10px;">
+            <i th:class="${i le rating} ? 'fas fa-star' : 'far fa-star'"></i>
+        </div>
+    </div>
+    <p>[[${review}]]</p>
+</div>
+
+</body>
+</html>

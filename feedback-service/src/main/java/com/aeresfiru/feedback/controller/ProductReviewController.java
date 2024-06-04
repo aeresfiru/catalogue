@@ -6,30 +6,29 @@ import com.aeresfiru.feedback.service.ProductReviewService;
 import com.aeresfiru.feedback.service.dto.CreateProductReviewRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/feedback-api/v1/product-reviews")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductReviewController {
 
     private final ProductReviewService productReviewService;
     private final ProductReviewResourceAssembler resourceAssembler;
 
     @GetMapping
-    public Mono<Page<ProductReviewResource>> findProductReviews(
-            @RequestParam("productId") int productId,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size
+    public Flux<ProductReviewResource> findProductReviews(
+            @RequestParam("productId") int productId
     ) {
-        return this.productReviewService.findAllProductReviews(productId, PageRequest.of(page, size))
-                .map(productReviews -> productReviews.map(this.resourceAssembler::toResource));
+        return this.productReviewService.findAllProductReviews(productId)
+                .map(this.resourceAssembler::toResource);
     }
 
     @PostMapping

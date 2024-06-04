@@ -32,10 +32,13 @@ public class ProductListController {
             Model model
     ) {
         return this.productService.findAllProducts(filter, pageNumber, pageSize)
-                .doOnNext(page -> model.addAttribute("products", page.content())
-                        .addAttribute("filter", filter)
-                        .addAttribute("page", page.page())
-                        .addAttribute("size", page.size()))
+                .doOnNext(productPage -> model.addAttribute("products", productPage.content())
+                        .addAttribute("products", productPage.content())
+                        .addAttribute("currentPage", pageNumber)
+                        .addAttribute("totalPages", productPage.totalElements() / pageSize)
+                        .addAttribute("pageSize", pageSize)
+                        .addAttribute("totalElements", productPage.totalElements())
+                        .addAttribute("filter", filter))
                 .thenReturn("customer/products/list");
     }
 

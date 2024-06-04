@@ -225,7 +225,7 @@ class ProductControllerTest {
                         Mono.just(new Product(1, "title", "description")),
                         Mono.just(new CreateProductReviewRequest(1, null, null)), model, response))
                 // then
-                .expectNext("customer/products/product")
+                .expectNext("/customer/products/product")
                 .verifyComplete();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

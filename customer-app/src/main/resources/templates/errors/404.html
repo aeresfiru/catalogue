@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Not Found</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>404 Not Found</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/error-page.css}" rel="stylesheet">
 </head>
 <body>
-<h1>404: Not Found</h1>
-<br>
-<i data-th-text="${error}"></i>
+
+<div class="container">
+    <div class="error-code">404</div>
+    <h1>Oops! Page Not Found</h1>
+    <p class="error-message">The page you are looking for might have been removed, had its name changed, or is
+        temporarily unavailable.</p>
+    <a href="/" class="btn btn-primary">Go Back to Home</a>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 </body>
 </html>

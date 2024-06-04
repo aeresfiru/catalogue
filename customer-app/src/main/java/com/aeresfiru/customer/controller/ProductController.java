@@ -78,7 +78,7 @@ public class ProductController {
                             model.addAttribute("payload", tuple.getT2())
                                     .addAttribute("errors", ex.getErrors());
                             response.setStatusCode(HttpStatus.BAD_REQUEST);
-                            return Mono.just("customer/products/product");
+                            return Mono.just("/customer/products/product");
                         }));
     }
 

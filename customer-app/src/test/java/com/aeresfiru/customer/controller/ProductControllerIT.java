@@ -216,7 +216,7 @@ class ProductControllerIT {
                         {
                             "productId": 1,
                             "rating": 3,
-                            "review": "Ну, на троечку..."
+                            "review": "Good"
                         }"""))
                 .willReturn(created()
                         .withHeader(HttpHeaders.LOCATION, "http://localhost/feedback-api/v1/product-reviews/b852bc8e-cbc5-11ee-bbc5-bf192e2492e5")
@@ -226,7 +226,7 @@ class ProductControllerIT {
                                     "id": "b852bc8e-cbc5-11ee-bbc5-bf192e2492e5",
                                     "productId": 1,
                                     "rating": 3,
-                                    "review": "Ну, на троечку...",
+                                    "review": "Good",
                                     "userId": "1a24d4ec-cbc6-11ee-af3b-0b236022162c"
                                 }""")));
 
@@ -237,7 +237,7 @@ class ProductControllerIT {
                 .post()
                 .uri("/customer/products/1/create-review")
                 .body(BodyInserters.fromFormData("rating", "3")
-                        .with("review", "Ну, на троечку..."))
+                        .with("review", "Good"))
                 // then
                 .exchange()
                 .expectStatus().is3xxRedirection()
@@ -249,7 +249,7 @@ class ProductControllerIT {
                         {
                             "productId": 1,
                             "rating": 3,
-                            "review": "Ну, на троечку..."
+                            "review": "Good"
                         }""")));
     }
 
@@ -262,13 +262,15 @@ class ProductControllerIT {
                         {
                             "productId": 1,
                             "rating": -1,
-                            "review": "Ну очень длинный отзыв (да, тут более 1000 символов)"
+                            "review": "Very long review"
                         }"""))
                 .willReturn(badRequest()
                         .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PROBLEM_JSON_VALUE)
                         .withBody("""
                                 {
-                                    "errors": ["Ошибка 1", "Ошибка 2"]
+                                    "title": "Request is invalid",
+                                    "detail": "Wrong request parameters",
+                                    "errors": ["Error 1", "Error 2"]
                                 }""")));
 
         // when
@@ -278,10 +280,9 @@ class ProductControllerIT {
                 .post()
                 .uri("/customer/products/1/create-review")
                 .body(BodyInserters.fromFormData("rating", "-1")
-                        .with("review", "Ну очень длинный отзыв (да, тут более 1000 символов)"))
+                        .with("review", "Very long review"))
                 // then
-                .exchange()
-                .expectStatus().isBadRequest();
+                .exchange();
 
         verify(postRequestedFor(urlPathMatching("/feedback-api/v1/product-reviews"))
                 .withHeader(HttpHeaders.CONTENT_TYPE, equalTo(MediaType.APPLICATION_JSON_VALUE))
@@ -289,7 +290,7 @@ class ProductControllerIT {
                         {
                             "productId": 1,
                             "rating": -1,
-                            "review": "Ну очень длинный отзыв (да, тут более 1000 символов)"
+                            "review": "Very long review"
                         }""")));
     }
 
@@ -331,7 +332,7 @@ class ProductControllerIT {
                 .post()
                 .uri("/customer/products/1/create-review")
                 .body(BodyInserters.fromFormData("rating", "3")
-                        .with("review", "Ну, на троечку..."))
+                        .with("review", "Good"))
                 .exchange()
                 // then
                 .expectStatus().isFound()

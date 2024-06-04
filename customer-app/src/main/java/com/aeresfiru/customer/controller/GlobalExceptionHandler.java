@@ -10,8 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.Locale;
+import org.springframework.web.reactive.resource.NoResourceFoundException;
+import org.springframework.web.server.MethodNotAllowedException;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -35,14 +35,24 @@ public class GlobalExceptionHandler {
         return "errors/404";
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNoHandlerFoundException(NoResourceFoundException ex) {
+        log.error("No handler found", ex);
+        return "errors/404";
+    }
+
+    @ExceptionHandler(MethodNotAllowedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public String handleMethodNotAllowedException(MethodNotAllowedException ex) {
+        log.error("Method not allowed", ex);
+        return "errors/404";
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleException(Exception ex) {
         log.error("Unexpected exception occurred", ex);
         return "errors/500";
-    }
-
-    private String getMessage(String code, Locale locale) {
-        return this.messageSource.getMessage(code, new Object[0], locale);
     }
 }

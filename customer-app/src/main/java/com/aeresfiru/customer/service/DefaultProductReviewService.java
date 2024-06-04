@@ -22,6 +22,7 @@ public class DefaultProductReviewService implements ProductReviewService {
     public Flux<ProductReview> findProductReviews(Integer productId) {
         return this.productClient.findProduct(productId)
                 .flatMapMany(product -> this.productReviewClient.findProductReviewsByProductId(productId))
+                .doOnNext(reviews -> log.info("Retrieved reviews: {}", reviews))
                 .doOnError(ex -> log.error("Error retrieving product reviews with ID: {}", productId, ex));
     }
 

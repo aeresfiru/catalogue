@@ -2,11 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Server unavailable</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>500 Internal Server Error</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/error-page.css}" rel="stylesheet">
 </head>
 <body>
-<h1>500: Server unavailable</h1>
-<br>
-<i data-th-text="${error}"></i>
+
+<div class="container">
+    <div class="error-code">500</div>
+    <h1>Oops! Internal Server Error</h1>
+    <p class="error-message">There was a problem with the server, please try again later.</p>
+    <a href="/" class="btn btn-primary">Go Back to Home</a>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
 </body>
 </html>

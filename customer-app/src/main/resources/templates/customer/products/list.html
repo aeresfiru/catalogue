@@ -2,25 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product list &ndash; aeresfiru</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-<h1>Product list</h1>
-<a data-th-href="@{/customer/products/favourites}">Favourite products</a>
-<form>
-    <label>
-        Filter: <input type="text" name="filter" data-th-value="${filter != null ? filter : ''}">
-        <button type="submit">Search</button>
-    </label>
-</form>
-<ul>
-    <li data-th-each="product : ${products}">
-        <strong>
-            <a data-th-text="${product.title}"
-               data-th-href="@{/customer/products/{productId}(productId=${product.id})}"></a>
-        </strong>
-        <p data-th-text="${product.details}"></p>
-    </li>
-</ul>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container p-5">
+    <section class="container mt-5 flex-grow-1">
+        <div class="row">
+            <div th:each="product : ${products}" class="col-md-4 mb-4">
+                <div class="card">
+                    <a th:href="@{/customer/products/{productId}(productId=${product.id})}" class="product-link">
+                        <img src="https://via.placeholder.com/300x200" class="card-img-top"
+                             alt="Product Image">
+                        <div class="card-body">
+                            <h5 class="card-title">[[${product.title}]]</h5>
+                            <p class="card-text">[[${product.details}]]</p>
+                            <div class="text-warning">
+                                <!--                                <i class="fas fa-star" th:each="star : ${#numbers.sequence(1, product.rating)}"></i>-->
+                                <!--                                <i class="far fa-star" th:each="star : ${#numbers.sequence(product.rating + 1, 5)}"></i>-->
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/pagination :: pagination(${totalPages}, ${currentPage}, ${pageSize}, ${filter})}"></div>
+    </section>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/scroll_to_top_btn :: scrollToTopBtn}"></div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/scrollToTop.js}"></script>
 </body>
 </html>

@@ -1,0 +1,193 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+.navbar-custom {
+    background-color: #131921;
+    color: #fff;
+}
+
+.brand {
+    color: #FF9900;
+    text-decoration: none;
+}
+
+.brand:hover {
+    color: #FF9900;
+}
+
+.navbar-custom .nav-link {
+    color: #fff;
+}
+
+.navbar-custom .nav-link:hover {
+    color: #FF9900;
+}
+
+.navbar-custom .nav-link.active {
+    color: #FF9900;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.review {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.review p {
+    margin-bottom: 10px;
+}
+
+.rating {
+    unicode-bidi: bidi-override;
+    direction: rtl;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    font-size: 24px;
+    cursor: pointer;
+    color: #6c757d;
+}
+
+.rating label:hover,
+.rating label:hover ~ label {
+    color: #ffc107;
+}
+
+.rating input:checked ~ label {
+    color: #ffc107;
+}
+
+.pagination {
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.page-link {
+    color: #FFFFFF;
+    background-color: #000000;
+    border: 1px solid #000000;
+    margin: 0 2px;
+    font-weight: normal;
+}
+
+.page-link:hover {
+    color: #000000;
+    background-color: #FFD700;
+    border-color: #FFD700;
+}
+
+.page-item.active .page-link {
+    background-color: #FFD700;
+    border-color: #FFD700;
+}
+
+#scrollToTopBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    z-index: 99;
+}
+
+/* Custom styles for the product page */
+
+.product-details {
+    margin-bottom: 20px;
+}
+
+.product-details h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.product-details p {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.reviews-section {
+    margin-top: 40px;
+}
+
+.review-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.review-card h5 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.review-card p {
+    font-size: 16px;
+    color: #6c757d;
+}
+
+.review-form {
+    margin-top: 40px;
+}
+
+.product-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.text-warning {
+    font-size: 1rem;
+}
+
+.text-warning i {
+    color: #ffc107;
+}
+
+@media (max-width: 767px) {
+    .col-md-12 {
+        margin-bottom: 20px;
+    }
+}

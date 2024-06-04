@@ -1058,8 +1058,8 @@
       "clientId": "admin-service-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://admin.sc.com.192.168.49.2.nip.io",
-      "adminUrl": "http://admin.selm.ag.192.168.49.2.nip.io",
+      "rootUrl": "http://admin.sc.com.127.0.0.1.nip.io",
+      "adminUrl": "http://admin.selm.ag.127.0.0.1.nip.io",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -1067,10 +1067,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "Q2rxsXG0AzRbSdAzKkzLbecYmMDGDVKG",
       "redirectUris": [
-        "http://admin.sc.com.192.168.49.2.nip.io/*"
+        "http://admin.sc.com.127.0.0.1.nip.io/*"
       ],
       "webOrigins": [
-        "http://admin.sc.com.192.168.49.2.nip.io/*"
+        "http://admin.sc.com.127.0.0.1.nip.io/*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1580,18 +1580,18 @@
       "clientId": "catalogue-service-swagger-ui-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://catalogue.api.selm.ag.192.168.49.2.nip.io/swagger-ui",
-      "adminUrl": "http://catalogue.api.selm.ag.192.168.49.2.nip.io/swagger-ui",
+      "rootUrl": "http://catalogue.api.selm.ag.127.0.0.1.nip.io/swagger-ui",
+      "adminUrl": "http://catalogue.api.selm.ag.127.0.0.1.nip.io/swagger-ui",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://catalogue.api.selm.ag.192.168.49.2.nip.io/swagger-ui/*"
+        "http://catalogue.api.selm.ag.127.0.0.1.nip.io/swagger-ui/*"
       ],
       "webOrigins": [
-        "http://catalogue.api.selm.ag.192.168.49.2.nip.io"
+        "http://catalogue.api.selm.ag.127.0.0.1.nip.io"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1798,8 +1798,8 @@
       "clientId": "customer-app-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://customer.selm.ag.192.168.49.2.nip.io",
-      "adminUrl": "http://customer.selm.ag.192.168.49.2.nip.io",
+      "rootUrl": "http://customer.selm.ag.127.0.0.1.nip.io",
+      "adminUrl": "http://customer.selm.ag.127.0.0.1.nip.io",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -2063,8 +2063,8 @@
       "clientId": "eureka-server-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://eureka.selm.ag.192.168.49.2.nip.io",
-      "adminUrl": "http://eureka.selm.ag.192.168.49.2.nip.io",
+      "rootUrl": "http://eureka.selm.ag.127.0.0.1.nip.io",
+      "adminUrl": "http://eureka.selm.ag.127.0.0.1.nip.io",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
@@ -2383,18 +2383,18 @@
       "clientId": "feedback-service-swagger-ui-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://feedback.api.selm.ag.192.168.49.2.nip.io/webjars/swagger-ui",
-      "adminUrl": "http://feedback.api.selm.ag.192.168.49.2.nip.io/webjars/swagger-ui",
+      "rootUrl": "http://feedback.api.selm.ag.127.0.0.1.nip.io/webjars/swagger-ui",
+      "adminUrl": "http://feedback.api.selm.ag.127.0.0.1.nip.io/webjars/swagger-ui",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://feedback.api.selm.ag.192.168.49.2.nip.io/webjars/swagger-ui/*"
+        "http://feedback.api.selm.ag.127.0.0.1.nip.io/webjars/swagger-ui/*"
       ],
       "webOrigins": [
-        "http://feedback.api.selm.ag.192.168.49.2.nip.io"
+        "http://feedback.api.selm.ag.127.0.0.1.nip.io"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -2596,8 +2596,8 @@
       "clientId": "manager-app-k8s",
       "name": "",
       "description": "",
-      "rootUrl": "http://manager.selm.ag.192.168.49.2.nip.io",
-      "adminUrl": "http://manager.selm.ag.192.168.49.2.nip.io",
+      "rootUrl": "http://manager.selm.ag.127.0.0.1.nip.io",
+      "adminUrl": "http://manager.selm.ag.127.0.0.1.nip.io",
       "baseUrl": "",
       "surrogateAuthRequired": false,
       "enabled": true,
